@@ -1,40 +1,39 @@
-# PulseLink - URL Shortener SaaS
+# PulseLink (Django + Nuxt rebuild)
 
-Production-ready URL shortener with premium features, Stripe billing, Next.js App Router UI, Prisma/PostgreSQL data layer, and secure authentication via NextAuth (email/password + Google). Includes admin tooling, GDPR-friendly analytics, ads for free tier, and deployment guidance.
+This project now ships a Python/Django backend (REST API) and a Nuxt 3 frontend. The backend targets PostgreSQL (Render + Neon) and integrates Razorpay for payments; the frontend includes Google AdSense rendering support.
 
-## Features
-- Marketing site: landing, pricing, FAQ, contact, legal pages (Privacy, Terms, Cookies).
-- Auth: email/password with verification, password reset, Google OAuth, optional TOTP 2FA for premium.
-- Plans: free (ad-supported) vs premium (no ads) with quotas and entitlements.
-- Link management: custom slugs, reserved words, QR codes, UTM builder, folders/tags, editing, search, previews, safety checks, bulk CSV shortening.
-- Redirect engine: 301/302 toggles, password-protected links, expiration, bot filtering, rate limits, cached lookups.
-- Analytics: referrer/device/country/region, campaign params, daily chart-ready data, CSV export (premium), retention windows by plan.
-- Payments: Stripe Checkout + Customer Portal, webhook lifecycle handling, proration-aware upgrades, tax/VAT via Stripe settings.
-- Admin: user management snapshot, abuse reports, block/disable malicious links/domains, feature flag toggles.
-- Compliance & security: CSRF protection via NextAuth, input validation (Zod), reCAPTCHA hooks, secure headers, audit logging, secrets via env.
+## Stack
+- **Backend**: Django 5, Django REST Framework, PostgreSQL via `DATABASE_URL`, Razorpay order endpoint.
+- **Frontend**: Nuxt 3 (Vue), runtime-configurable API base URL, Razorpay checkout, and AdSense banner component.
 
-## Getting Started
-1. Copy `.env.example` to `.env` and fill secrets (Postgres, Stripe, Google OAuth, NextAuth secret, AdSense IDs, reCAPTCHA).
-2. Install dependencies and generate Prisma client:
+## Quickstart
+1. Copy `.env.example` to `.env` at the repository root. Fill in `DATABASE_URL`, `SECRET_KEY`, and Razorpay/AdSense values.
+2. Backend setup
    ```bash
+   cd backend
+   python -m venv .venv && source .venv/bin/activate
+   pip install -r requirements.txt
+   python manage.py migrate
+   python manage.py createsuperuser  # optional, for admin
+   python manage.py runserver 0.0.0.0:8000
+   ```
+3. Frontend setup
+   ```bash
+   cd frontend
    npm install
-   npx prisma migrate dev
-   npm run seed
+   npm run dev -- --port 3000
    ```
-3. Run the dev server:
-   ```bash
-   npm run dev
-   ```
-4. Sign in with seeded admin: `admin@pulselink.test / Admin123!`
+4. Configure Nuxt runtime env (e.g., `API_BASE=http://localhost:8000/api`).
 
-## Stripe Webhook
-Expose your local server (e.g., `stripe listen --forward-to localhost:3000/api/webhooks/stripe`). The webhook verifies signatures with `STRIPE_WEBHOOK_SECRET`.
+## Deployment (Render + Neon)
+- Set `DATABASE_URL` to your Neon connection string (include `sslmode=require` as needed).
+- Run `python manage.py migrate` during the Render build/launch phase.
+- Expose env vars for `SECRET_KEY`, `RAZORPAY_KEY_ID`, `RAZORPAY_KEY_SECRET`, and `NUXT_PUBLIC_ADSENSE_CLIENT`.
+- Serve the Django app with Gunicorn (see `backend/requirements.txt`) and deploy the Nuxt build separately (e.g., Render static or Node service).
 
-## Deployment
-- Frontend: Vercel, Render, or Fly.io.
-- Database: Managed Postgres (Neon, Supabase, RDS).
-- Environment: set all secrets and run `prisma migrate deploy`.
-- AdSense: provide client + slot IDs; ads excluded from redirect endpoints.
+## API surface
+- `POST /api/payments/razorpay/order/` – creates a Razorpay order using backend credentials.
+- `GET/POST /api/links/` – basic CRUD for links (slug + destination URL).
 
-## Testing
-Unit/integration tests should focus on auth, link creation, redirect, and webhook handlers. Add additional tests under `src/__tests__` as needed.
+## Notes
+- The previous Next.js/Prisma implementation has been superseded by this Django + Nuxt stack; migrate data into the new schema before going live.
