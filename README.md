@@ -33,7 +33,10 @@ This project now ships a Python/Django backend (REST API) and a Nuxt 3 frontend.
 
 ## API surface
 - `POST /api/payments/razorpay/order/` – creates a Razorpay order using backend credentials.
-- `GET/POST /api/links/` – basic CRUD for links (slug + destination URL).
+- `GET/POST /api/links/` – basic CRUD for links (slug + destination URL, optional password + expiry).
+- `GET/POST /api/domains/` – manage custom domains for links.
+- `GET /api/click-events/` – read-only analytics stream (filterable by `link`, `slug`, or `domain` query params).
+- `GET /api/r/<slug>/` – resolves a short link, enforces password/expiry, records a click event, and redirects.
 
 ## Notes
 - The previous Next.js/Prisma implementation has been superseded by this Django + Nuxt stack; migrate data into the new schema before going live.
