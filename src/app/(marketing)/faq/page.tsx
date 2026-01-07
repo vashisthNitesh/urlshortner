@@ -7,7 +7,7 @@ const faqs = [
   },
   {
     q: "How do quotas and entitlements work?",
-    a: "We evaluate subscription status via Stripe webhooks and enforce limits (link counts, custom domains, bulk size, analytics retention) during API calls."
+    a: "We evaluate subscription status via Razorpay webhooks and enforce limits (link counts, custom domains, bulk size, analytics retention) during API calls."
   },
   {
     q: "Is data GDPR compliant?",
@@ -15,7 +15,7 @@ const faqs = [
   },
   {
     q: "Can I self-host?",
-    a: "The repo ships with Prisma/Postgres, Stripe integration, and environment-driven secrets. Deploy on Vercel/Render/Fly with managed Postgres."
+    a: "The repo ships with Prisma/Postgres, Razorpay integration, and environment-driven secrets. Deploy on Vercel/Render/Fly with managed Postgres."
   }
 ];
 

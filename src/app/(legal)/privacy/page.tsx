@@ -12,7 +12,7 @@ export default function PrivacyPage() {
           </p>
           <ul className="list-disc space-y-2 pl-6 text-sm text-slate-700 dark:text-slate-200">
             <li>Users can request deletion of account data via support.</li>
-            <li>Stripe manages payment details; we store customer and subscription identifiers only.</li>
+            <li>Razorpay manages payment details; we store customer and subscription identifiers only.</li>
             <li>Geo data is inferred from headers or third-party providers with opt-out for DNT signals.</li>
             <li>reCAPTCHA protects signups and link creation for free tier.</li>
           </ul>

@@ -1,32 +1,38 @@
 import { NextResponse } from "next/server";
 import { auth } from "@/lib/auth";
-import { getStripeClient, stripePriceLookup } from "@/lib/stripe";
+import { getRazorpayClient, razorpayPlanLookup } from "@/lib/razorpay";
 import { prisma } from "@/lib/prisma";
 
 export async function POST(request: Request) {
   const session = await auth();
   if (!session?.user) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
   const form = await request.formData();
-  const priceId = (form.get("priceId") as string) || stripePriceLookup.monthly;
-  const stripe = getStripeClient();
+  const planId = (form.get("planId") as string) || razorpayPlanLookup.monthly;
+  const razorpay = getRazorpayClient();
 
   const user = await prisma.user.findUnique({ where: { id: session.user.id } });
-  const customer = user?.stripeCustomerId
-    ? user.stripeCustomerId
-    : (await stripe.customers.create({ email: user?.email || undefined, metadata: { userId: user?.id } })).id;
+  const customer =
+    user?.razorpayCustomerId ??
+    (
+      await razorpay.customers.create({
+        email: user?.email || undefined,
+        name: user?.name || undefined,
+        notes: { userId: user?.id || "" }
+      })
+    ).id;
 
-  if (!user?.stripeCustomerId) {
-    await prisma.user.update({ where: { id: session.user.id }, data: { stripeCustomerId: customer } });
+  if (!user?.razorpayCustomerId) {
+    await prisma.user.update({ where: { id: session.user.id }, data: { razorpayCustomerId: customer } });
   }
 
-  const checkout = await stripe.checkout.sessions.create({
-    customer,
-    mode: "subscription",
-    line_items: [{ price: priceId, quantity: 1 }],
-    success_url: `${process.env.NEXTAUTH_URL}/billing?success=1`,
-    cancel_url: `${process.env.NEXTAUTH_URL}/billing?canceled=1`,
-    subscription_data: { trial_period_days: 0 }
+  const subscription = await razorpay.subscriptions.create({
+    plan_id: planId,
+    customer_id: customer,
+    total_count: planId === razorpayPlanLookup.annual ? 1 : 12,
+    customer_notify: 1,
+    notes: { userId: session.user.id }
   });
 
-  return NextResponse.redirect(checkout.url!, 303);
+  const redirectUrl = subscription.short_url || `${process.env.NEXTAUTH_URL}/billing?pending=1`;
+  return NextResponse.redirect(redirectUrl, 303);
 }

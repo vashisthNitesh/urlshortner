@@ -14,8 +14,8 @@ export default async function BillingPage() {
     );
   }
   const plans = [
-    { id: "monthly", name: "Monthly", price: "$19", priceId: process.env.STRIPE_MONTHLY_PRICE_ID || "price_monthly_placeholder" },
-    { id: "annual", name: "Annual", price: "$190", priceId: process.env.STRIPE_ANNUAL_PRICE_ID || "price_annual_placeholder" }
+    { id: "monthly", name: "Monthly", price: "$19", planId: process.env.RAZORPAY_MONTHLY_PLAN_ID || "plan_monthly_placeholder" },
+    { id: "annual", name: "Annual", price: "$190", planId: process.env.RAZORPAY_ANNUAL_PLAN_ID || "plan_annual_placeholder" }
   ];
 
   return (
@@ -25,11 +25,9 @@ export default async function BillingPage() {
           <p className="text-sm text-slate-500">Billing</p>
           <h1 className="text-3xl font-bold">Manage subscription</h1>
         </div>
-        <form action="/api/billing-portal" method="POST">
-          <button className="btn" type="submit">
-            Open customer portal
-          </button>
-        </form>
+        <Link className="btn" href="mailto:billing@pulselink.app">
+          Contact billing support
+        </Link>
       </div>
       <div className="grid gap-4 md:grid-cols-2">
         {plans.map((plan) => (
@@ -39,7 +37,7 @@ export default async function BillingPage() {
                 <p className="text-sm text-slate-500">{plan.name}</p>
                 <p className="text-2xl font-bold">{plan.price}</p>
               </div>
-              <input type="hidden" name="priceId" value={plan.priceId} />
+              <input type="hidden" name="planId" value={plan.planId} />
               <button className="btn-primary" type="submit">
                 Subscribe
               </button>
