@@ -5,7 +5,7 @@ import Link from "next/link";
 const highlights = [
   "GDPR-friendly analytics with bot filtering",
   "Premium custom domains with SSL and safety checks",
-  "Stripe-powered subscriptions with tax/VAT support",
+  "Razorpay-powered subscriptions with tax/VAT support",
   "2FA for premium, reCAPTCHA for free tier signups"
 ];
 
@@ -22,7 +22,7 @@ export default function HomePage() {
               Shorten, brand, and secure every link with enterprise controls.
             </h1>
             <p className="text-lg text-slate-600 dark:text-slate-300">
-              PulseLink combines fast redirects, granular analytics, premium domains, and Stripe-powered billing in a single
+              PulseLink combines fast redirects, granular analytics, premium domains, and Razorpay-powered billing in a single
               deployable Next.js platform. Free users see tasteful AdSense placements; premium customers enjoy an ad-free, unlimited
               experience.
             </p>
@@ -80,7 +80,7 @@ export default function HomePage() {
             <div className="card bg-slate-800 text-white">
               <h3 className="text-lg font-semibold">Billing</h3>
               <p className="text-sm text-slate-200">
-                Stripe Checkout + Customer Portal with proration, tax/VAT settings, and subscription lifecycle webhooks.
+                Razorpay checkout links with tax/VAT settings and subscription lifecycle webhooks.
               </p>
             </div>
             <div className="card bg-slate-800 text-white">

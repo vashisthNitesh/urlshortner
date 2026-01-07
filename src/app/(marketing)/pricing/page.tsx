@@ -26,7 +26,7 @@ export default function PricingPage() {
           <h1 className="text-4xl font-bold">Transparent pricing</h1>
           <p className="mt-3 text-lg text-slate-600 dark:text-slate-300">
             Upgrade to premium for custom domains, advanced security, longer retention, and ad-free dashboards. Taxes handled via
-            Stripe settings automatically.
+            Razorpay settings automatically.
           </p>
         </div>
         <div className="mx-auto mt-10 grid max-w-5xl gap-6 md:grid-cols-2">

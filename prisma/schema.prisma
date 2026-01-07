@@ -22,8 +22,8 @@ model User {
   role                 Role      @default(free)
   twoFactorSecret      String?
   twoFactorEnabled     Boolean   @default(false)
-  stripeCustomerId     String?   @unique
-  stripeSubscriptionId String?   @unique
+  razorpayCustomerId     String?   @unique
+  razorpaySubscriptionId String?   @unique
   subscriptionStatus   String?   
   createdAt            DateTime  @default(now())
   updatedAt            DateTime  @updatedAt
