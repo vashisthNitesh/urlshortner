@@ -1,0 +1,25 @@
+{% extends "base.html" %}
+
+{% block title %}API keys | genieURL{% endblock %}
+
+{% block content %}
+<div class="container mt-4">
+  <div class="card p-4">
+    <h3>API access</h3>
+    {% if is_premium %}
+      <p class="text-muted">Use this API key with the REST endpoints.</p>
+      {% if api_key %}
+        <div class="alert alert-secondary">{{ api_key }}</div>
+      {% else %}
+        <p>No API key yet.</p>
+      {% endif %}
+      <form method="post">
+        {% csrf_token %}
+        <button class="btn btn-primary" type="submit">Generate API key</button>
+      </form>
+    {% else %}
+      <p class="text-muted">Upgrade to premium to unlock API access.</p>
+    {% endif %}
+  </div>
+</div>
+{% endblock %}

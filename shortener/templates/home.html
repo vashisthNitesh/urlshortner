@@ -1,6 +1,6 @@
 {% extends "base.html" %}
 
-{% block title %}PulseLink | Home{% endblock %}
+{% block title %}genieURL | Home{% endblock %}
 
 {% block content %}
 <section class="hero">
@@ -9,14 +9,17 @@
       <span class="pill">Production-ready URL shortener</span>
       <h1>Shorten, brand, and secure every link with enterprise controls.</h1>
       <p class="lead">
-        PulseLink brings fast redirects, premium domain support, and actionable analytics into a Django-powered stack—no Node.js or
+        genieURL brings fast redirects, premium domain support, and actionable analytics into a Django-powered stack—no Node.js or
         React required.
       </p>
       <div class="actions">
-        <a class="btn-primary" href="{% url 'register' %}">Launch your workspace</a>
-        <a class="btn" href="{% url 'pricing' %}">View pricing</a>
+        <a class="btn btn-primary" href="{% url 'register' %}">Launch your workspace</a>
+        <a class="btn btn-outline-primary" href="{% url 'pricing' %}">View pricing</a>
       </div>
-      <div class="highlight-grid">
+      {% if not user.is_authenticated %}
+        <div class="ad-slot mt-3">Ad slot (Google AdSense / partner)</div>
+      {% endif %}
+      <div class="highlight-grid mt-4">
         {% for item in highlights %}
         <div class="card">
           <p>{{ item }}</p>
@@ -25,17 +28,21 @@
       </div>
     </div>
     <div class="card">
-      <h3>Core capabilities</h3>
-      <ul>
-        <li>301/302 redirects with password protection & expiration</li>
-        <li>QR codes, UTM builder, bulk CSV import, link folders and tags</li>
-        <li>Safety previews with malware flagging and abuse reporting</li>
-        <li>Admin toolkit for users, domains, abuse, feature flags</li>
-      </ul>
-      <div class="notice">
-        <h4>Ad-supported demo</h4>
-        <p>Normal users see Google AdSense placements. Premium users enjoy an ad-free experience.</p>
+      <h3>Create a short link</h3>
+      <form method="post" class="form-grid">
+        {% csrf_token %}
+        {{ form.as_p }}
+        <button class="btn btn-primary" type="submit">Shorten</button>
+      </form>
+      {% if created_short_url %}
+      <div class="notice success mt-3">
+        <strong>Success!</strong> Short link created:
+        <a href="{{ created_short_url }}">{{ created_short_url }}</a>
       </div>
+      {% endif %}
+      {% if created_link and created_link.qr_code_image %}
+        <img class="qr-preview mt-3" src="{{ created_link.qr_code_image.url }}" alt="QR code" />
+      {% endif %}
     </div>
   </div>
 </section>
@@ -50,7 +57,7 @@
           Deploy behind your WAF/CDN and set strict security headers out of the box.
         </p>
       </div>
-      <a class="btn-secondary" href="{% url 'privacy' %}">Review policies</a>
+      <a class="btn btn-secondary" href="{% url 'privacy' %}">Review policies</a>
     </div>
     <div class="feature-grid">
       <div class="card dark-card">

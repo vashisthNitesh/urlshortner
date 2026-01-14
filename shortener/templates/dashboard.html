@@ -1,84 +1,87 @@
 {% extends "base.html" %}
 
-{% block title %}PulseLink | Dashboard{% endblock %}
+{% block title %}Dashboard | genieURL{% endblock %}
 
 {% block content %}
-<section class="section">
-  <div class="container">
-    <div class="section-header">
-      <div>
-        <p class="eyebrow">Workspace</p>
-        <h1>Dashboard</h1>
-        <p class="muted">Create and manage short links. Active plan: <strong>{{ plan }}</strong>.</p>
-      </div>
-      <div class="plan-switcher">
-        <a class="btn{% if not is_premium %} btn-primary{% endif %}" href="{% url 'dashboard' %}?plan=normal">Normal user</a>
-        <a class="btn{% if is_premium %} btn-primary{% endif %}" href="{% url 'dashboard' %}?plan=premium">Premium user</a>
-      </div>
+<div class="container mt-4">
+  <div class="d-flex justify-content-between align-items-center mb-3">
+    <div>
+      <h2>Your dashboard</h2>
+      <p class="text-muted">Plan: {{ plan }}</p>
     </div>
-    <div class="grid-two">
-      <div class="card">
-        <h2>New link</h2>
-        {% if success_slug %}
-        <div class="notice success">Link created! Share /r/{{ success_slug }}.</div>
-        {% endif %}
+    <div class="d-flex gap-2">
+      <a class="btn btn-outline-secondary" href="{% url 'api_keys' %}">API keys</a>
+      <a class="btn btn-outline-secondary" href="{% url 'custom_domains' %}">Custom domains</a>
+      <a class="btn btn-outline-primary" href="{% url 'billing' %}">Billing</a>
+    </div>
+  </div>
+
+  {% if ad_enabled %}
+    <div class="ad-slot mb-4">Ad slot (Google AdSense / partner)</div>
+  {% endif %}
+
+  <div class="row g-4">
+    <div class="col-lg-5">
+      <div class="card p-4">
+        <h4>Create a new short link</h4>
         <form method="post">
           {% csrf_token %}
-          {{ form.non_field_errors }}
-          <input type="hidden" name="plan" value="{{ plan|lower }}" />
-          <label for="id_url">Destination URL</label>
-          {{ form.url }}
-          <label for="id_slug">Custom slug</label>
-          {{ form.slug }}
-          <label for="id_title">Title (optional)</label>
-          {{ form.title }}
-          <button class="btn-primary" type="submit">Create link</button>
+          {{ form.as_p }}
+          <button class="btn btn-primary" type="submit">Shorten</button>
         </form>
-        <div class="notice">
-          <h3>Plan features</h3>
-          <ul class="feature-list">
-            <li>Normal users access core shortening and analytics.</li>
-            <li>Premium users unlock branded domains, QR codes, and exportable reports.</li>
-            <li>Upgrade anytime via Razorpay checkout.</li>
-          </ul>
-          <a class="btn-secondary" href="{% url 'pricing' %}">Review plan details</a>
+      </div>
+    </div>
+    <div class="col-lg-7">
+      <div class="card p-4">
+        <div class="d-flex justify-content-between align-items-center mb-3">
+          <h4 class="mb-0">Your links</h4>
+          <form method="get" class="d-flex gap-2">
+            <input class="form-control form-control-sm" type="search" name="q" placeholder="Search" />
+            <button class="btn btn-outline-secondary btn-sm" type="submit">Filter</button>
+          </form>
         </div>
-      </div>
-      <div class="card">
-        <h2>Recent links</h2>
-        <ul class="link-list">
-          {% for link in links %}
-          <li>
-            <div>
-              <strong>{{ link.title|default:link.slug }}</strong>
-              <span>/r/{{ link.slug }}</span>
-            </div>
-            <a class="btn" href="{% url 'redirect' slug=link.slug %}" target="_blank">Open</a>
-          </li>
-          {% empty %}
-          <li class="muted">No links created yet.</li>
-          {% endfor %}
-        </ul>
+        {% if links %}
+          <div class="table-responsive">
+            <table class="table table-sm">
+              <thead>
+                <tr>
+                  <th>Slug</th>
+                  <th>Destination</th>
+                  <th>Clicks</th>
+                  <th>QR</th>
+                  <th></th>
+                </tr>
+              </thead>
+              <tbody>
+                {% for link in links %}
+                  <tr>
+                    <td><a href="{% url 'link_detail' link.slug %}">{{ link.slug }}</a></td>
+                    <td class="text-truncate" style="max-width: 200px;">{{ link.destination_url }}</td>
+                    <td>{{ link.clicks.count }}</td>
+                    <td>
+                      {% if link.qr_code_image %}
+                        <a href="{{ link.qr_code_image.url }}" download>Download</a>
+                      {% else %}
+                        —
+                      {% endif %}
+                    </td>
+                    <td class="text-end">
+                      <a class="btn btn-sm btn-outline-primary" href="{% url 'link_edit' link.slug %}">Edit</a>
+                      <form method="post" action="{% url 'link_delete' link.slug %}" class="d-inline">
+                        {% csrf_token %}
+                        <button class="btn btn-sm btn-outline-danger" type="submit">Disable</button>
+                      </form>
+                    </td>
+                  </tr>
+                {% endfor %}
+              </tbody>
+            </table>
+          </div>
+        {% else %}
+          <p class="text-muted">No links yet. Create your first short URL.</p>
+        {% endif %}
       </div>
     </div>
-    {% if not is_premium %}
-    <div class="ad-card">
-      <div>
-        <p class="eyebrow">Google AdSense</p>
-        <h3>Sponsored placement for normal users</h3>
-        <p class="muted">
-          Normal users see AdSense placements to keep PulseLink free. Upgrade to Premium to remove ads across the dashboard
-          and redirect previews.
-        </p>
-      </div>
-      <a class="btn-primary" href="{% url 'pricing' %}">Upgrade with Razorpay</a>
-    </div>
-    {% else %}
-    <div class="notice success">
-      <h3>Premium experience activated</h3>
-      <p>No ads are displayed for premium users. Enjoy full analytics, custom domains, and priority support.</p>
-    </div>
-    {% endif %}
   </div>
-</section>
+</div>
 {% endblock %}

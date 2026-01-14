@@ -1,15 +1,15 @@
 {% extends "base.html" %}
 
-{% block title %}PulseLink | Pricing{% endblock %}
+{% block title %}genieURL | Pricing{% endblock %}
 
 {% block content %}
-<section class="section">
+<section class="section mt-4">
   <div class="container">
     <h1>Flexible pricing for every team</h1>
     <p class="lead">Start as a normal user with ad-supported access or upgrade to premium for an ad-free experience.</p>
     <div class="pricing-grid">
       {% for tier in tiers %}
-      <div class="card">
+      <div class="card p-4">
         <h3>{{ tier.name }}</h3>
         <p class="price">{{ tier.price }}</p>
         <ul>
@@ -17,7 +17,7 @@
           <li>{{ feature }}</li>
           {% endfor %}
         </ul>
-        <a class="btn-primary" href="{% url 'register' %}">{{ tier.cta }}</a>
+        <a class="btn btn-primary" href="{% url 'register' %}">{{ tier.cta }}</a>
       </div>
       {% endfor %}
     </div>

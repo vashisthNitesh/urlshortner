@@ -1,0 +1,29 @@
+{% extends "base.html" %}
+
+{% block title %}Custom domains | genieURL{% endblock %}
+
+{% block content %}
+<div class="container mt-4">
+  <div class="card p-4">
+    <h3>Custom domains</h3>
+    {% if is_premium %}
+      <form method="post" class="mb-3">
+        {% csrf_token %}
+        <div class="input-group">
+          <input class="form-control" type="text" name="domain" placeholder="mydomain.com" />
+          <button class="btn btn-primary" type="submit">Add domain</button>
+        </div>
+      </form>
+      <ul>
+        {% for domain in domains %}
+          <li>{{ domain.domain }} — {% if domain.is_verified %}Verified{% else %}Pending verification{% endif %}</li>
+        {% empty %}
+          <li>No custom domains yet.</li>
+        {% endfor %}
+      </ul>
+    {% else %}
+      <p class="text-muted">Upgrade to premium to use branded links.</p>
+    {% endif %}
+  </div>
+</div>
+{% endblock %}
