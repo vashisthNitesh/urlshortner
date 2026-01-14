@@ -1,0 +1,38 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>{% block title %}PulseLink{% endblock %}</title>
+    <link rel="stylesheet" href="{{ static('css/styles.css') }}" />
+  </head>
+  <body>
+    <header class="site-header">
+      <div class="container">
+        <a class="logo" href="{{ url('home') }}">PulseLink</a>
+        <nav class="nav">
+          <a href="{{ url('pricing') }}">Pricing</a>
+          <a href="{{ url('dashboard') }}">Dashboard</a>
+          <a href="{{ url('privacy') }}">Privacy</a>
+        </nav>
+        <div class="nav-actions">
+          <a class="btn" href="{{ url('login') }}">Login</a>
+          <a class="btn-primary" href="{{ url('register') }}">Start free</a>
+        </div>
+      </div>
+    </header>
+    <main>
+      {% block content %}{% endblock %}
+    </main>
+    <footer class="site-footer">
+      <div class="container">
+        <p>© 2024 PulseLink. Built with Django + Jinja.</p>
+        <div class="footer-links">
+          <a href="{{ url('terms') }}">Terms</a>
+          <a href="{{ url('cookies') }}">Cookies</a>
+          <a href="{{ url('privacy') }}">Privacy</a>
+        </div>
+      </div>
+    </footer>
+  </body>
+</html>

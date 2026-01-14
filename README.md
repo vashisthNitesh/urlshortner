@@ -1,24 +1,22 @@
-# PulseLink (Next.js + Nuxt)
+# PulseLink (Django + Jinja)
 
-This repository contains a Next.js application at the repository root and a Nuxt 3 application in `frontend/`.
+This repository now contains a Django application that renders Jinja templates for the PulseLink URL shortener experience. The stack no longer depends on Node.js, React, or Nuxt.
 
 ## Stack
-- **Web app (root)**: Next.js 14
-- **Web app (`frontend/`)**: Nuxt 3 (Vue)
+- **Web app**: Django + Jinja2
+- **Database**: SQLite (default)
 
 ## Quickstart
-### Next.js app (root)
 ```bash
-npm install
-npm run dev
+python -m venv .venv
+source .venv/bin/activate
+pip install -r requirements.txt
+python manage.py migrate
+python manage.py runserver
 ```
 
-### Nuxt app (`frontend/`)
-```bash
-cd frontend
-npm install
-npm run dev -- --port 3000
-```
+Visit `http://127.0.0.1:8000` to view the marketing site and demo dashboard.
 
 ## Notes
-- Keep the frontend app configs aligned with whatever API you are targeting.
+- The dashboard includes a simple link creation form backed by Django models.
+- Customize styles in `shortener/static/css/styles.css`.

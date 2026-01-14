@@ -1,0 +1,52 @@
+{% extends "base.html" %}
+
+{% block title %}PulseLink | Dashboard{% endblock %}
+
+{% block content %}
+<section class="section">
+  <div class="container">
+    <div class="section-header">
+      <div>
+        <p class="eyebrow">Workspace</p>
+        <h1>Dashboard</h1>
+        <p class="muted">Create and manage short links using Django + Jinja.</p>
+      </div>
+    </div>
+    <div class="grid-two">
+      <div class="card">
+        <h2>New link</h2>
+        {% if success_slug %}
+        <div class="notice success">Link created! Share /r/{{ success_slug }}.</div>
+        {% endif %}
+        <form method="post">
+          {% csrf_token %}
+          {{ form.non_field_errors }}
+          <label for="id_url">Destination URL</label>
+          {{ form.url }}
+          <label for="id_slug">Custom slug</label>
+          {{ form.slug }}
+          <label for="id_title">Title (optional)</label>
+          {{ form.title }}
+          <button class="btn-primary" type="submit">Create link</button>
+        </form>
+      </div>
+      <div class="card">
+        <h2>Recent links</h2>
+        <ul class="link-list">
+          {% for link in links %}
+          <li>
+            <div>
+              <strong>{{ link.title or link.slug }}</strong>
+              <span>/r/{{ link.slug }}</span>
+            </div>
+            <a class="btn" href="{{ url('redirect', slug=link.slug) }}" target="_blank">Open</a>
+          </li>
+          {% else %}
+          <li class="muted">No links created yet.</li>
+          {% endfor %}
+        </ul>
+      </div>
+    </div>
+  </div>
+</section>
+{% endblock %}

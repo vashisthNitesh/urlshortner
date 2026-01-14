@@ -1,0 +1,26 @@
+{% extends "base.html" %}
+
+{% block title %}PulseLink | Pricing{% endblock %}
+
+{% block content %}
+<section class="section">
+  <div class="container">
+    <h1>Flexible pricing for every team</h1>
+    <p class="lead">Start free and upgrade when you need premium security, domains, and analytics.</p>
+    <div class="pricing-grid">
+      {% for tier in tiers %}
+      <div class="card">
+        <h3>{{ tier.name }}</h3>
+        <p class="price">{{ tier.price }}</p>
+        <ul>
+          {% for feature in tier.features %}
+          <li>{{ feature }}</li>
+          {% endfor %}
+        </ul>
+        <a class="btn-primary" href="{{ url('register') }}">{{ tier.cta }}</a>
+      </div>
+      {% endfor %}
+    </div>
+  </div>
+</section>
+{% endblock %}
