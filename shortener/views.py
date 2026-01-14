@@ -9,7 +9,8 @@ from .models import Link
 HIGHLIGHTS = [
     "GDPR-friendly analytics with bot filtering",
     "Premium custom domains with SSL and safety checks",
-    "Subscription-ready billing workflows",
+    "Razorpay-backed upgrades for premium access",
+    "AdSense-ready placements for free plans",
     "Security checks and safe-link previews",
 ]
 
@@ -20,18 +21,26 @@ def home(request: HttpRequest) -> HttpResponse:
 
 def pricing(request: HttpRequest) -> HttpResponse:
     tiers = [
-        {"name": "Free", "price": "$0", "features": ["Basic redirects", "Ad-supported"], "cta": "Start free"},
         {
-            "name": "Growth",
-            "price": "$19",
-            "features": ["Custom domains", "Password-protected links", "Analytics exports"],
-            "cta": "Upgrade",
+            "name": "Normal",
+            "price": "$0",
+            "features": [
+                "Basic redirects and branded short links",
+                "Ad-supported experience with Google AdSense slots",
+                "Standard analytics and link history",
+            ],
+            "cta": "Create a free account",
         },
         {
-            "name": "Enterprise",
-            "price": "Custom",
-            "features": ["Dedicated support", "Audit logs", "Advanced security controls"],
-            "cta": "Talk to sales",
+            "name": "Premium",
+            "price": "$19",
+            "features": [
+                "No ads for you or your visitors",
+                "Custom domains, password-protected links, and QR codes",
+                "Advanced analytics exports and priority support",
+                "Upgrade via Razorpay checkout",
+            ],
+            "cta": "Upgrade with Razorpay",
         },
     ]
     return render(request, "pricing.html", {"tiers": tiers})
@@ -48,16 +57,24 @@ def register(request: HttpRequest) -> HttpResponse:
 def dashboard(request: HttpRequest) -> HttpResponse:
     form = LinkForm()
     success_slug = request.GET.get("created")
+    plan = (request.GET.get("plan") or request.POST.get("plan") or "normal").lower()
+    is_premium = plan == "premium"
     if request.method == "POST":
         form = LinkForm(request.POST)
         if form.is_valid():
             link = form.save()
-            return redirect(f"{reverse('dashboard')}?created={link.slug}")
+            return redirect(f"{reverse('dashboard')}?created={link.slug}&plan={plan}")
     links = Link.objects.order_by("-created_at")
     return render(
         request,
         "dashboard.html",
-        {"form": form, "links": links, "success_slug": success_slug},
+        {
+            "form": form,
+            "links": links,
+            "success_slug": success_slug,
+            "plan": "Premium" if is_premium else "Normal",
+            "is_premium": is_premium,
+        },
     )
 
 

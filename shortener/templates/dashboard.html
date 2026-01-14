@@ -9,7 +9,11 @@
       <div>
         <p class="eyebrow">Workspace</p>
         <h1>Dashboard</h1>
-        <p class="muted">Create and manage short links using Django + Jinja.</p>
+        <p class="muted">Create and manage short links. Active plan: <strong>{{ plan }}</strong>.</p>
+      </div>
+      <div class="plan-switcher">
+        <a class="btn{% if not is_premium %} btn-primary{% endif %}" href="{{ url('dashboard') }}?plan=normal">Normal user</a>
+        <a class="btn{% if is_premium %} btn-primary{% endif %}" href="{{ url('dashboard') }}?plan=premium">Premium user</a>
       </div>
     </div>
     <div class="grid-two">
@@ -21,6 +25,7 @@
         <form method="post">
           {% csrf_token %}
           {{ form.non_field_errors }}
+          <input type="hidden" name="plan" value="{{ plan|lower }}" />
           <label for="id_url">Destination URL</label>
           {{ form.url }}
           <label for="id_slug">Custom slug</label>
@@ -29,6 +34,15 @@
           {{ form.title }}
           <button class="btn-primary" type="submit">Create link</button>
         </form>
+        <div class="notice">
+          <h3>Plan features</h3>
+          <ul class="feature-list">
+            <li>Normal users access core shortening and analytics.</li>
+            <li>Premium users unlock branded domains, QR codes, and exportable reports.</li>
+            <li>Upgrade anytime via Razorpay checkout.</li>
+          </ul>
+          <a class="btn-secondary" href="{{ url('pricing') }}">Review plan details</a>
+        </div>
       </div>
       <div class="card">
         <h2>Recent links</h2>
@@ -47,6 +61,24 @@
         </ul>
       </div>
     </div>
+    {% if not is_premium %}
+    <div class="ad-card">
+      <div>
+        <p class="eyebrow">Google AdSense</p>
+        <h3>Sponsored placement for normal users</h3>
+        <p class="muted">
+          Normal users see AdSense placements to keep PulseLink free. Upgrade to Premium to remove ads across the dashboard
+          and redirect previews.
+        </p>
+      </div>
+      <a class="btn-primary" href="{{ url('pricing') }}">Upgrade with Razorpay</a>
+    </div>
+    {% else %}
+    <div class="notice success">
+      <h3>Premium experience activated</h3>
+      <p>No ads are displayed for premium users. Enjoy full analytics, custom domains, and priority support.</p>
+    </div>
+    {% endif %}
   </div>
 </section>
 {% endblock %}

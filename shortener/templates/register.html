@@ -16,6 +16,14 @@
         <input type="password" placeholder="Minimum 8 characters" />
         <button class="btn-primary" type="submit">Create account</button>
       </form>
+      <div class="notice">
+        <h3>Upgrade to Premium with Razorpay</h3>
+        <p class="muted">
+          Normal users keep ad-supported access, while premium users unlock custom domains, advanced analytics, and an ad-free
+          experience. Complete your upgrade securely via Razorpay after registering.
+        </p>
+        <a class="btn-secondary" href="{{ url('pricing') }}">Pay with Razorpay</a>
+      </div>
       <p class="muted">Already registered? <a href="{{ url('login') }}">Sign in</a></p>
     </div>
   </div>
