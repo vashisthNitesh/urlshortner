@@ -282,6 +282,8 @@ def terms(request: HttpRequest) -> HttpResponse:
 @require_http_methods(["POST"])
 def api_create_link(request: HttpRequest) -> JsonResponse:
     api_key = request.headers.get("X-API-Key") or request.POST.get("api_key")
+    if not api_key:
+        return JsonResponse({"error": "API key required"}, status=401)
     user_profile = UserProfile.objects.filter(api_key=api_key).select_related("user").first()
     if not user_profile:
         return JsonResponse({"error": "Invalid API key"}, status=401)
@@ -314,6 +316,8 @@ def api_create_link(request: HttpRequest) -> JsonResponse:
 @require_http_methods(["GET"])
 def api_link_detail(request: HttpRequest, slug: str) -> JsonResponse:
     api_key = request.headers.get("X-API-Key") or request.GET.get("api_key")
+    if not api_key:
+        return JsonResponse({"error": "API key required"}, status=401)
     user_profile = UserProfile.objects.filter(api_key=api_key).select_related("user").first()
     if not user_profile:
         return JsonResponse({"error": "Invalid API key"}, status=401)
