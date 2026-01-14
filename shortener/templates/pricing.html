@@ -6,7 +6,7 @@
 <section class="section">
   <div class="container">
     <h1>Flexible pricing for every team</h1>
-    <p class="lead">Start free and upgrade when you need premium security, domains, and analytics.</p>
+    <p class="lead">Start as a normal user with ad-supported access or upgrade to premium for an ad-free experience.</p>
     <div class="pricing-grid">
       {% for tier in tiers %}
       <div class="card">
@@ -20,6 +20,10 @@
         <a class="btn-primary" href="{{ url('register') }}">{{ tier.cta }}</a>
       </div>
       {% endfor %}
+    </div>
+    <div class="notice">
+      <strong>Payments:</strong> Premium upgrades are processed through Razorpay. Normal users keep full access to core
+      shortening features with AdSense placements.
     </div>
   </div>
 </section>
