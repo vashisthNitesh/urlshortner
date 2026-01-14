@@ -1,0 +1,71 @@
+{% extends "base.html" %}
+
+{% block title %}PulseLink | Home{% endblock %}
+
+{% block content %}
+<section class="hero">
+  <div class="container hero-grid">
+    <div>
+      <span class="pill">Production-ready URL shortener</span>
+      <h1>Shorten, brand, and secure every link with enterprise controls.</h1>
+      <p class="lead">
+        PulseLink brings fast redirects, premium domain support, and actionable analytics into a Django-powered stack—no Node.js or
+        React required.
+      </p>
+      <div class="actions">
+        <a class="btn-primary" href="{{ url('register') }}">Launch your workspace</a>
+        <a class="btn" href="{{ url('pricing') }}">View pricing</a>
+      </div>
+      <div class="highlight-grid">
+        {% for item in highlights %}
+        <div class="card">
+          <p>{{ item }}</p>
+        </div>
+        {% endfor %}
+      </div>
+    </div>
+    <div class="card">
+      <h3>Core capabilities</h3>
+      <ul>
+        <li>301/302 redirects with password protection & expiration</li>
+        <li>QR codes, UTM builder, bulk CSV import, link folders and tags</li>
+        <li>Safety previews with malware flagging and abuse reporting</li>
+        <li>Admin toolkit for users, domains, abuse, feature flags</li>
+      </ul>
+      <div class="notice">
+        <h4>Ad-supported demo</h4>
+        <p>Reserve placement for AdSense or sponsored content for free tiers.</p>
+      </div>
+    </div>
+  </div>
+</section>
+<section class="dark">
+  <div class="container">
+    <div class="section-header">
+      <div>
+        <p class="eyebrow">Security & compliance</p>
+        <h2>Hardened defaults for regulated teams</h2>
+        <p>
+          CSRF-safe session handling, webhook signature verification, audit logging, and per-plan entitlements keep your data safe.
+          Deploy behind your WAF/CDN and set strict security headers out of the box.
+        </p>
+      </div>
+      <a class="btn-secondary" href="{{ url('privacy') }}">Review policies</a>
+    </div>
+    <div class="feature-grid">
+      <div class="card dark-card">
+        <h3>Auth</h3>
+        <p>Email/password with verification, OAuth, optional 2FA for premium users.</p>
+      </div>
+      <div class="card dark-card">
+        <h3>Billing</h3>
+        <p>Subscription-ready checkout flows and lifecycle webhooks.</p>
+      </div>
+      <div class="card dark-card">
+        <h3>Analytics</h3>
+        <p>Device, country, referrer, and campaign insights with export options.</p>
+      </div>
+    </div>
+  </div>
+</section>
+{% endblock %}
