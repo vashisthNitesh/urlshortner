@@ -23,7 +23,7 @@
         <div class="notice success">Link created! Share /r/{{ success_slug }}.</div>
         {% endif %}
         <form method="post">
-          {% csrf_token %}
+          {{ csrf_input() }}
           {{ form.non_field_errors }}
           <input type="hidden" name="plan" value="{{ plan|lower }}" />
           <label for="id_url">Destination URL</label>
