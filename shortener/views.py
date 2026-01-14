@@ -47,10 +47,14 @@ def pricing(request: HttpRequest) -> HttpResponse:
 
 
 def login_view(request: HttpRequest) -> HttpResponse:
+    if request.method == "POST":
+        return redirect("dashboard")
     return render(request, "login.html")
 
 
 def register(request: HttpRequest) -> HttpResponse:
+    if request.method == "POST":
+        return redirect("dashboard")
     return render(request, "register.html")
 
 
