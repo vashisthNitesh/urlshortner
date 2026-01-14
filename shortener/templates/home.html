@@ -13,8 +13,8 @@
         React required.
       </p>
       <div class="actions">
-        <a class="btn-primary" href="{{ url('register') }}">Launch your workspace</a>
-        <a class="btn" href="{{ url('pricing') }}">View pricing</a>
+        <a class="btn-primary" href="{% url 'register' %}">Launch your workspace</a>
+        <a class="btn" href="{% url 'pricing' %}">View pricing</a>
       </div>
       <div class="highlight-grid">
         {% for item in highlights %}
@@ -50,7 +50,7 @@
           Deploy behind your WAF/CDN and set strict security headers out of the box.
         </p>
       </div>
-      <a class="btn-secondary" href="{{ url('privacy') }}">Review policies</a>
+      <a class="btn-secondary" href="{% url 'privacy' %}">Review policies</a>
     </div>
     <div class="feature-grid">
       <div class="card dark-card">

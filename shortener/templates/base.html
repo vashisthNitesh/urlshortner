@@ -1,3 +1,4 @@
+{% load static %}
 <!doctype html>
 <html lang="en">
   <head>
@@ -10,20 +11,20 @@
       href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700;800&family=Space+Grotesk:wght@500;600;700&display=swap"
       rel="stylesheet"
     />
-    <link rel="stylesheet" href="{{ static('css/styles.css') }}" />
+    <link rel="stylesheet" href="{% static 'css/styles.css' %}" />
   </head>
   <body>
     <header class="site-header">
       <div class="container">
-        <a class="logo" href="{{ url('home') }}">PulseLink</a>
+        <a class="logo" href="{% url 'home' %}">PulseLink</a>
         <nav class="nav">
-          <a href="{{ url('pricing') }}">Pricing</a>
-          <a href="{{ url('dashboard') }}">Dashboard</a>
-          <a href="{{ url('privacy') }}">Privacy</a>
+          <a href="{% url 'pricing' %}">Pricing</a>
+          <a href="{% url 'dashboard' %}">Dashboard</a>
+          <a href="{% url 'privacy' %}">Privacy</a>
         </nav>
         <div class="nav-actions">
-          <a class="btn" href="{{ url('login') }}">Login</a>
-          <a class="btn-primary" href="{{ url('register') }}">Start free</a>
+          <a class="btn" href="{% url 'login' %}">Login</a>
+          <a class="btn-primary" href="{% url 'register' %}">Start free</a>
         </div>
       </div>
     </header>
@@ -32,11 +33,11 @@
     </main>
     <footer class="site-footer">
       <div class="container">
-        <p>© 2024 PulseLink. Built with Django + Jinja.</p>
+        <p>© 2024 PulseLink. Built with Django.</p>
         <div class="footer-links">
-          <a href="{{ url('terms') }}">Terms</a>
-          <a href="{{ url('cookies') }}">Cookies</a>
-          <a href="{{ url('privacy') }}">Privacy</a>
+          <a href="{% url 'terms' %}">Terms</a>
+          <a href="{% url 'cookies' %}">Cookies</a>
+          <a href="{% url 'privacy' %}">Privacy</a>
         </div>
       </div>
     </footer>

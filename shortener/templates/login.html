@@ -8,15 +8,15 @@
     <div class="card">
       <h1>Sign in</h1>
       <p class="muted">This demo uses placeholder authentication screens.</p>
-      <form method="post" action="{{ url('login') }}">
-        {{ csrf_input() }}
+      <form method="post" action="{% url 'login' %}">
+        {% csrf_token %}
         <label>Email</label>
         <input type="email" placeholder="you@company.com" />
         <label>Password</label>
         <input type="password" placeholder="••••••••" />
         <button class="btn-primary" type="submit">Sign in</button>
       </form>
-      <p class="muted">Need an account? <a href="{{ url('register') }}">Register</a></p>
+      <p class="muted">Need an account? <a href="{% url 'register' %}">Register</a></p>
     </div>
   </div>
 </section>
