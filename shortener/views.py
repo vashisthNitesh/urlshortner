@@ -1,9 +1,35 @@
-from django.http import HttpRequest, HttpResponse, HttpResponseRedirect
+import hmac
+import json
+import os
+from collections import Counter
+from datetime import timedelta
+from hashlib import sha256
+
+from django.contrib import messages
+from django.contrib.auth import authenticate, login, logout
+from django.contrib.auth.decorators import login_required
+from django.core.cache import cache
+from django.db import models
+from django.db.models import Q
+from django.db.models import Count
+from django.http import HttpRequest, HttpResponse, HttpResponseRedirect, JsonResponse
 from django.shortcuts import get_object_or_404, redirect, render
 from django.urls import reverse
+from django.utils import timezone
+from django.views.decorators.csrf import csrf_exempt
+from django.views.decorators.http import require_http_methods
 
-from .forms import LinkForm
-from .models import Link
+from .forms import GuestLinkForm, LinkForm, LoginForm, RegisterForm
+from .models import (
+    ClickEvent,
+    CustomDomain,
+    Link,
+    LinkDestinationChange,
+    SubscriptionEvent,
+    UserProfile,
+    generate_unique_slug,
+)
+
 
 
 HIGHLIGHTS = [
@@ -16,7 +42,31 @@ HIGHLIGHTS = [
 
 
 def home(request: HttpRequest) -> HttpResponse:
-    return render(request, "home.html", {"highlights": HIGHLIGHTS})
+    form = GuestLinkForm()
+    created_link = None
+    created_short_url = None
+    if request.method == "POST":
+        ip = get_client_ip(request) or "anonymous"
+        if not rate_limit(f"guest:{ip}", limit=10, window_seconds=60):
+            messages.error(request, "Rate limit exceeded. Please try again shortly.")
+            return redirect("home")
+        form = GuestLinkForm(request.POST)
+        if form.is_valid():
+            created_link = form.save(commit=False)
+            created_link.guest_email = form.cleaned_data["email"]
+            created_link.save()
+            created_short_url = created_link.short_url(request)
+            messages.success(request, "Short link created.")
+    return render(
+        request,
+        "home.html",
+        {
+            "highlights": HIGHLIGHTS,
+            "form": form,
+            "created_link": created_link,
+            "created_short_url": created_short_url,
+        },
+    )
 
 
 def pricing(request: HttpRequest) -> HttpResponse:
@@ -47,44 +97,173 @@ def pricing(request: HttpRequest) -> HttpResponse:
 
 
 def login_view(request: HttpRequest) -> HttpResponse:
-    if request.method == "POST":
+    form = LoginForm(request, data=request.POST or None)
+    if request.method == "POST" and form.is_valid():
+        login(request, form.get_user())
         return redirect("dashboard")
-    return render(request, "login.html")
+    return render(request, "login.html", {"form": form})
 
 
 def register(request: HttpRequest) -> HttpResponse:
-    if request.method == "POST":
+    form = RegisterForm(request.POST or None)
+    if request.method == "POST" and form.is_valid():
+        user = form.save()
+        user = authenticate(username=user.username, password=form.cleaned_data["password1"])
+        if user:
+            login(request, user)
         return redirect("dashboard")
-    return render(request, "register.html")
+    return render(request, "register.html", {"form": form})
 
 
+def logout_view(request: HttpRequest) -> HttpResponse:
+    logout(request)
+    return redirect("home")
+
+
+@login_required
 def dashboard(request: HttpRequest) -> HttpResponse:
-    form = LinkForm()
-    success_slug = request.GET.get("created")
-    plan = (request.GET.get("plan") or request.POST.get("plan") or "normal").lower()
-    is_premium = plan == "premium"
+    profile = request.user.profile
+    is_premium = profile.is_premium()
+    form = LinkForm(user=request.user, is_premium=is_premium)
     if request.method == "POST":
-        form = LinkForm(request.POST)
+        form = LinkForm(request.POST, user=request.user, is_premium=is_premium)
         if form.is_valid():
-            link = form.save()
-            return redirect(f"{reverse('dashboard')}?created={link.slug}&plan={plan}")
-    links = Link.objects.order_by("-created_at")
-    return render(
-        request,
-        "dashboard.html",
-        {
-            "form": form,
-            "links": links,
-            "success_slug": success_slug,
-            "plan": "Premium" if is_premium else "Normal",
-            "is_premium": is_premium,
-        },
+            link = form.save(commit=False)
+            link.user = request.user
+            link.save()
+            form.save_m2m()
+            if is_premium:
+                link.generate_qr_code(link.short_url(request))
+                link.save(update_fields=["qr_code_image"])
+            messages.success(request, "Short link created.")
+            return redirect("dashboard")
+    links = Link.objects.filter(user=request.user).order_by("-created_at")
+    query = request.GET.get("q")
+    if query:
+        links = links.filter(Q(title__icontains=query) | Q(slug__icontains=query))
+    context = {
+        "form": form,
+        "links": links,
+        "is_premium": is_premium,
+        "plan": "Premium" if is_premium else "Free",
+        "ad_enabled": not is_premium,
+    }
+    return render(request, "dashboard.html", context)
+
+
+@login_required
+def link_detail(request: HttpRequest, slug: str) -> HttpResponse:
+    link = get_object_or_404(Link, slug=slug, user=request.user)
+    profile = request.user.profile
+    is_premium = profile.is_premium()
+    clicks = link.clicks.order_by("-created_at")[:50]
+    totals = link.clicks.count()
+    by_date_qs = (
+        link.clicks.annotate(date=models.functions.TruncDate("created_at"))
+        .values("date")
+        .annotate(count=Count("id"))
+        .order_by("date")
     )
+    by_date = [{"date": item["date"].isoformat(), "count": item["count"]} for item in by_date_qs]
+    referrer_counts = Counter(click.referrer or "Direct" for click in link.clicks.all())
+    context = {
+        "link": link,
+        "clicks": clicks,
+        "totals": totals,
+        "by_date": json.dumps(by_date),
+        "referrers": referrer_counts.most_common(5) if is_premium else [],
+        "is_premium": is_premium,
+    }
+    return render(request, "link_detail.html", context)
 
 
-def redirect_link(_request: HttpRequest, slug: str) -> HttpResponseRedirect:
-    link = get_object_or_404(Link, slug=slug)
-    return redirect(link.url)
+@login_required
+def link_edit(request: HttpRequest, slug: str) -> HttpResponse:
+    link = get_object_or_404(Link, slug=slug, user=request.user)
+    form = LinkForm(instance=link, user=request.user, is_premium=request.user.profile.is_premium())
+    if request.method == "POST":
+        form = LinkForm(
+            request.POST,
+            instance=link,
+            user=request.user,
+            is_premium=request.user.profile.is_premium(),
+        )
+        if form.is_valid():
+            previous_url = link.destination_url
+            updated_link = form.save()
+            if previous_url != updated_link.destination_url:
+                LinkDestinationChange.objects.create(
+                    link=updated_link,
+                    previous_url=previous_url,
+                    new_url=updated_link.destination_url,
+                    changed_by=request.user,
+                )
+                updated_link.last_destination_change_at = timezone.now()
+                updated_link.destination_change_count += 1
+                updated_link.save(update_fields=["last_destination_change_at", "destination_change_count"])
+            if request.user.profile.is_premium():
+                updated_link.generate_qr_code(updated_link.short_url(request))
+                updated_link.save(update_fields=["qr_code_image"])
+            messages.success(request, "Link updated.")
+            return redirect("link_detail", slug=link.slug)
+    return render(request, "link_edit.html", {"form": form, "link": link})
+
+
+@login_required
+@require_http_methods(["POST"])
+def link_delete(request: HttpRequest, slug: str) -> HttpResponse:
+    link = get_object_or_404(Link, slug=slug, user=request.user)
+    link.is_active = False
+    link.save(update_fields=["is_active"])
+    messages.warning(request, "Link disabled.")
+    return redirect("dashboard")
+
+
+@login_required
+def api_keys(request: HttpRequest) -> HttpResponse:
+    profile = request.user.profile
+    if request.method == "POST":
+        if not profile.is_premium():
+            messages.error(request, "Upgrade to premium to use API access.")
+            return redirect("api_keys")
+        profile.ensure_api_key()
+        messages.success(request, "API key generated.")
+    return render(request, "api_keys.html", {"api_key": profile.api_key, "is_premium": profile.is_premium()})
+
+
+@login_required
+def custom_domains(request: HttpRequest) -> HttpResponse:
+    profile = request.user.profile
+    if not profile.is_premium():
+        messages.error(request, "Upgrade to premium to manage custom domains.")
+        return redirect("dashboard")
+    if request.method == "POST":
+        domain = request.POST.get("domain", "").strip().lower()
+        if domain:
+            CustomDomain.objects.get_or_create(user=request.user, domain=domain)
+            messages.success(request, "Domain added. Verification pending.")
+    domains = CustomDomain.objects.filter(user=request.user)
+    return render(request, "custom_domains.html", {"domains": domains, "is_premium": profile.is_premium()})
+
+
+@login_required
+def billing(request: HttpRequest) -> HttpResponse:
+    profile = request.user.profile
+    return render(request, "billing.html", {"profile": profile, "is_premium": profile.is_premium()})
+
+
+def redirect_link(request: HttpRequest, slug: str) -> HttpResponseRedirect:
+    host = request.get_host().split(":")[0]
+    link = Link.objects.filter(slug=slug).select_related("custom_domain").first()
+    if link and link.custom_domain and link.custom_domain.domain != host:
+        link = Link.objects.filter(slug=slug, custom_domain__domain=host).first()
+    if not link:
+        return redirect("home")
+    if not link.is_available():
+        messages.error(request, "This link is inactive or expired.")
+        return redirect("home")
+    record_click(request, link)
+    return redirect(link.destination_url, permanent=link.redirect_type == Link.REDIRECT_301)
 
 
 def privacy(request: HttpRequest) -> HttpResponse:
@@ -97,3 +276,145 @@ def cookies(request: HttpRequest) -> HttpResponse:
 
 def terms(request: HttpRequest) -> HttpResponse:
     return render(request, "terms.html")
+
+
+@csrf_exempt
+@require_http_methods(["POST"])
+def api_create_link(request: HttpRequest) -> JsonResponse:
+    api_key = request.headers.get("X-API-Key") or request.POST.get("api_key")
+    user_profile = UserProfile.objects.filter(api_key=api_key).select_related("user").first()
+    if not user_profile:
+        return JsonResponse({"error": "Invalid API key"}, status=401)
+    if not user_profile.is_premium():
+        return JsonResponse({"error": "Premium plan required"}, status=403)
+    if not rate_limit(f"api:{api_key}", limit=30, window_seconds=60):
+        return JsonResponse({"error": "Rate limit exceeded"}, status=429)
+    try:
+        payload = json.loads(request.body.decode("utf-8") or "{}")
+    except json.JSONDecodeError:
+        return JsonResponse({"error": "Invalid JSON payload"}, status=400)
+    link = Link(
+        user=user_profile.user,
+        destination_url=payload.get("destination_url", ""),
+        slug=payload.get("slug") or "",
+        title=payload.get("title", ""),
+    )
+    if not link.slug:
+        link.slug = generate_unique_slug()
+    try:
+        link.full_clean()
+    except Exception as exc:
+        return JsonResponse({"error": str(exc)}, status=400)
+    link.save()
+    link.generate_qr_code(link.short_url(request))
+    link.save(update_fields=["qr_code_image"])
+    return JsonResponse({"slug": link.slug, "short_url": link.short_url(request)})
+
+
+@require_http_methods(["GET"])
+def api_link_detail(request: HttpRequest, slug: str) -> JsonResponse:
+    api_key = request.headers.get("X-API-Key") or request.GET.get("api_key")
+    user_profile = UserProfile.objects.filter(api_key=api_key).select_related("user").first()
+    if not user_profile:
+        return JsonResponse({"error": "Invalid API key"}, status=401)
+    if not user_profile.is_premium():
+        return JsonResponse({"error": "Premium plan required"}, status=403)
+    link = get_object_or_404(Link, slug=slug, user=user_profile.user)
+    return JsonResponse(
+        {
+            "slug": link.slug,
+            "destination_url": link.destination_url,
+            "clicks": link.clicks.count(),
+            "created_at": link.created_at.isoformat(),
+            "expires_at": link.expires_at.isoformat() if link.expires_at else None,
+        }
+    )
+
+
+@csrf_exempt
+@require_http_methods(["POST"])
+def razorpay_webhook(request: HttpRequest) -> JsonResponse:
+    signature = request.headers.get("X-Razorpay-Signature", "")
+    secret = os.environ.get("RAZORPAY_WEBHOOK_SECRET", "")
+    body = request.body
+    expected_signature = hmac.new(secret.encode(), body, sha256).hexdigest()
+    if not hmac.compare_digest(signature, expected_signature):
+        return JsonResponse({"error": "Invalid signature"}, status=400)
+    payload = json.loads(body.decode("utf-8"))
+    event = payload.get("event", "")
+    event_id = payload.get("id", "")
+    user_id = payload.get("payload", {}).get("payment", {}).get("entity", {}).get("notes", {}).get("user_id")
+    plan = payload.get("payload", {}).get("payment", {}).get("entity", {}).get("notes", {}).get("plan")
+    amount = payload.get("payload", {}).get("payment", {}).get("entity", {}).get("amount", 0)
+    if user_id:
+        user_profile = UserProfile.objects.filter(user_id=user_id).first()
+        if user_profile:
+            user_profile.subscription_active = event == "payment.captured"
+            if user_profile.subscription_active:
+                user_profile.plan = UserProfile.PLAN_PREMIUM
+                user_profile.subscription_ends_at = timezone.now() + timedelta(days=30)
+            else:
+                user_profile.grace_period_ends_at = timezone.now() + timedelta(days=7)
+            user_profile.save()
+            SubscriptionEvent.objects.create(
+                user=user_profile.user,
+                status=event,
+                plan=plan or "",
+                amount=amount,
+                razorpay_event_id=event_id,
+                payload=payload,
+            )
+    return JsonResponse({"status": "ok"})
+
+
+def rate_limit(cache_key: str, limit: int, window_seconds: int) -> bool:
+    current = cache.get(cache_key, 0)
+    if current >= limit:
+        return False
+    cache.set(cache_key, current + 1, timeout=window_seconds)
+    return True
+
+
+def record_click(request: HttpRequest, link: Link) -> None:
+    user_agent = request.META.get("HTTP_USER_AGENT", "")
+    referrer = request.META.get("HTTP_REFERER", "")
+    device, browser = parse_user_agent(user_agent)
+    country = (
+        request.META.get("HTTP_CF_IPCOUNTRY")
+        or request.META.get("HTTP_X_COUNTRY_CODE")
+        or request.META.get("GEOIP_COUNTRY_NAME", "")
+    )
+    ClickEvent.objects.create(
+        link=link,
+        referrer=referrer,
+        ip_address=get_client_ip(request),
+        user_agent=user_agent[:255],
+        device=device,
+        browser=browser,
+        country=country,
+        is_qr=request.GET.get("qr") == "1",
+    )
+
+
+def get_client_ip(request: HttpRequest) -> str | None:
+    forwarded = request.META.get("HTTP_X_FORWARDED_FOR")
+    if forwarded:
+        return forwarded.split(",")[0].strip()
+    return request.META.get("REMOTE_ADDR")
+
+
+def parse_user_agent(user_agent: str) -> tuple[str, str]:
+    ua = user_agent.lower()
+    browser = "Other"
+    if "chrome" in ua:
+        browser = "Chrome"
+    elif "firefox" in ua:
+        browser = "Firefox"
+    elif "safari" in ua and "chrome" not in ua:
+        browser = "Safari"
+    device = "Desktop"
+    if "mobile" in ua:
+        device = "Mobile"
+    elif "tablet" in ua:
+        device = "Tablet"
+    return device, browser

@@ -1,0 +1,88 @@
+{% extends "base.html" %}
+
+{% block title %}Link analytics | genieURL{% endblock %}
+
+{% block content %}
+<div class="container mt-4">
+  <div class="d-flex justify-content-between align-items-center mb-3">
+    <div>
+      <h2>{{ link.title|default:link.slug }}</h2>
+      <p class="text-muted">{{ link.destination_url }}</p>
+    </div>
+    <a class="btn btn-outline-primary" href="{% url 'link_edit' link.slug %}">Edit link</a>
+  </div>
+
+  <div class="row g-4">
+    <div class="col-lg-4">
+      <div class="card p-4">
+        <h5>Total clicks</h5>
+        <h2>{{ totals }}</h2>
+        <p class="text-muted">Redirect type: {{ link.get_redirect_type_display }}</p>
+        {% if link.qr_code_image %}
+          <img class="qr-preview mt-3" src="{{ link.qr_code_image.url }}" alt="QR code" />
+        {% endif %}
+      </div>
+    </div>
+    <div class="col-lg-8">
+      <div class="card p-4">
+        <h5>Clicks over time</h5>
+        {% if is_premium %}
+          <canvas id="clickChart"></canvas>
+          <script>
+            const chartCtx = document.getElementById('clickChart');
+            const clickData = {{ by_date|safe }};
+            const labels = clickData.map(item => item.date);
+            const data = clickData.map(item => item.count);
+            new Chart(chartCtx, {
+              type: 'line',
+              data: {
+                labels: labels,
+                datasets: [{
+                  label: 'Clicks',
+                  data: data,
+                  borderColor: '#4f46e5',
+                  backgroundColor: 'rgba(79,70,229,0.2)',
+                  tension: 0.3
+                }]
+              }
+            });
+          </script>
+        {% else %}
+          <p class="text-muted">Upgrade to premium to see charts and full analytics.</p>
+        {% endif %}
+      </div>
+    </div>
+  </div>
+
+  <div class="row g-4 mt-3">
+    <div class="col-lg-6">
+      <div class="card p-4">
+        <h5>Top referrers</h5>
+        {% if is_premium %}
+          <ul>
+            {% for referrer, count in referrers %}
+              <li>{{ referrer }} - {{ count }}</li>
+            {% empty %}
+              <li>No referrer data yet.</li>
+            {% endfor %}
+          </ul>
+        {% else %}
+          <p class="text-muted">Upgrade to premium to see referrer insights.</p>
+        {% endif %}
+      </div>
+    </div>
+    <div class="col-lg-6">
+      <div class="card p-4">
+        <h5>Recent clicks</h5>
+        <ul>
+          {% for click in clicks %}
+            <li>{{ click.created_at }} · {{ click.device }} · {{ click.browser }} · {{ click.country }}</li>
+          {% empty %}
+            <li>No clicks yet.</li>
+          {% endfor %}
+        </ul>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}
