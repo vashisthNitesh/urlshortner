@@ -3,27 +3,47 @@
 {% block title %}Custom domains | genieURL{% endblock %}
 
 {% block content %}
-<div class="container mt-4">
-  <div class="card p-4">
-    <h3>Custom domains</h3>
-    {% if is_premium %}
-      <form method="post" class="mb-3">
-        {% csrf_token %}
-        <div class="input-group">
-          <input class="form-control" type="text" name="domain" placeholder="mydomain.com" />
-          <button class="btn btn-primary" type="submit">Add domain</button>
-        </div>
-      </form>
-      <ul>
-        {% for domain in domains %}
-          <li>{{ domain.domain }} — {% if domain.is_verified %}Verified{% else %}Pending verification{% endif %}</li>
-        {% empty %}
-          <li>No custom domains yet.</li>
-        {% endfor %}
-      </ul>
-    {% else %}
-      <p class="text-muted">Upgrade to premium to use branded links.</p>
-    {% endif %}
+<section class="section">
+  <div class="container">
+    <div class="section-header mb-4">
+      <div>
+        <h2 class="mb-1">Custom domains</h2>
+        <p class="text-muted">Serve branded links from your own domain with SSL security.</p>
+      </div>
+      <a class="btn btn-outline-primary" href="{% url 'billing' %}">Manage billing</a>
+    </div>
+
+    <div class="surface-card">
+      {% if is_premium %}
+        <form method="post" class="row g-3 align-items-end">
+          {% csrf_token %}
+          <div class="col-md-8">
+            <label class="form-label" for="domainInput">Domain</label>
+            <input class="form-control" id="domainInput" type="text" name="domain" placeholder="brand.yourcompany.com" />
+          </div>
+          <div class="col-md-4 d-grid">
+            <button class="btn btn-primary" type="submit">Add domain</button>
+          </div>
+        </form>
+        <hr />
+        <ul class="list-group list-group-flush">
+          {% for domain in domains %}
+            <li class="list-group-item d-flex justify-content-between align-items-center">
+              <span>{{ domain.domain }}</span>
+              {% if domain.is_verified %}
+                <span class="badge bg-success">Verified</span>
+              {% else %}
+                <span class="badge bg-warning text-dark">Pending verification</span>
+              {% endif %}
+            </li>
+          {% empty %}
+            <li class="list-group-item text-muted">No custom domains yet.</li>
+          {% endfor %}
+        </ul>
+      {% else %}
+        <p class="text-muted">Upgrade to premium to use branded links.</p>
+      {% endif %}
+    </div>
   </div>
-</div>
+</section>
 {% endblock %}

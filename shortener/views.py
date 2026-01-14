@@ -137,13 +137,58 @@ def dashboard(request: HttpRequest) -> HttpResponse:
                 link.save(update_fields=["qr_code_image"])
             messages.success(request, "Short link created.")
             return redirect("dashboard")
-    links = Link.objects.filter(user=request.user).order_by("-created_at")
+    link_qs = Link.objects.filter(user=request.user)
+    links = link_qs.order_by("-created_at")
     query = request.GET.get("q")
     if query:
         links = links.filter(Q(title__icontains=query) | Q(slug__icontains=query))
+
+    recent_links = link_qs.order_by("-created_at")[:5]
+    total_links = link_qs.count()
+    clicks_week = ClickEvent.objects.filter(
+        link__user=request.user,
+        created_at__gte=timezone.now() - timedelta(days=7),
+    ).count()
+    clicks_by_day_qs = (
+        ClickEvent.objects.filter(
+            link__user=request.user,
+            created_at__gte=timezone.now() - timedelta(days=14),
+        )
+        .annotate(date=models.functions.TruncDate("created_at"))
+        .values("date")
+        .annotate(count=Count("id"))
+        .order_by("date")
+    )
+    clicks_by_day = [{"date": item["date"].isoformat(), "count": item["count"]} for item in clicks_by_day_qs]
+    device_counts = list(
+        ClickEvent.objects.filter(link__user=request.user)
+        .values("device")
+        .annotate(count=Count("id"))
+        .order_by("-count")
+    )
+    browser_counts = list(
+        ClickEvent.objects.filter(link__user=request.user)
+        .values("browser")
+        .annotate(count=Count("id"))
+        .order_by("-count")
+    )
+    country_counts = list(
+        ClickEvent.objects.filter(link__user=request.user)
+        .values("country")
+        .annotate(count=Count("id"))
+        .order_by("-count")[:5]
+    )
+
     context = {
         "form": form,
         "links": links,
+        "recent_links": recent_links,
+        "total_links": total_links,
+        "clicks_week": clicks_week,
+        "clicks_by_day": json.dumps(clicks_by_day),
+        "device_counts": json.dumps(device_counts),
+        "browser_counts": json.dumps(browser_counts),
+        "country_counts": country_counts,
         "is_premium": is_premium,
         "plan": "Premium" if is_premium else "Free",
         "ad_enabled": not is_premium,
@@ -166,6 +211,9 @@ def link_detail(request: HttpRequest, slug: str) -> HttpResponse:
     )
     by_date = [{"date": item["date"].isoformat(), "count": item["count"]} for item in by_date_qs]
     referrer_counts = Counter(click.referrer or "Direct" for click in link.clicks.all())
+    device_counts = list(link.clicks.values("device").annotate(count=Count("id")).order_by("-count"))
+    browser_counts = list(link.clicks.values("browser").annotate(count=Count("id")).order_by("-count"))
+    country_counts = list(link.clicks.values("country").annotate(count=Count("id")).order_by("-count")[:5])
     context = {
         "link": link,
         "clicks": clicks,
@@ -173,6 +221,9 @@ def link_detail(request: HttpRequest, slug: str) -> HttpResponse:
         "by_date": json.dumps(by_date),
         "referrers": referrer_counts.most_common(5) if is_premium else [],
         "is_premium": is_premium,
+        "device_counts": json.dumps(device_counts),
+        "browser_counts": json.dumps(browser_counts),
+        "country_counts": country_counts,
     }
     return render(request, "link_detail.html", context)
 

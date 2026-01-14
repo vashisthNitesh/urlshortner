@@ -3,28 +3,69 @@
 {% block title %}genieURL | Pricing{% endblock %}
 
 {% block content %}
-<section class="section mt-4">
+<section class="section">
   <div class="container">
-    <h1>Flexible pricing for every team</h1>
-    <p class="lead">Start as a normal user with ad-supported access or upgrade to premium for an ad-free experience.</p>
+    <div class="section-header mb-4">
+      <div>
+        <p class="text-uppercase text-muted small mb-2">Pricing</p>
+        <h1 class="section-title">Flexible plans for every team.</h1>
+        <p class="lead">Start free, then scale with premium analytics and custom domains.</p>
+      </div>
+      <div class="d-flex gap-2">
+        <button class="btn btn-outline-secondary">Monthly</button>
+        <button class="btn btn-outline-secondary">Yearly</button>
+      </div>
+    </div>
+
     <div class="pricing-grid">
       {% for tier in tiers %}
-      <div class="card p-4">
+      <div class="surface-card">
         <h3>{{ tier.name }}</h3>
-        <p class="price">{{ tier.price }}</p>
-        <ul>
+        <p class="price mb-2">{{ tier.price }}<span class="text-muted small">/month</span></p>
+        <ul class="text-muted">
           {% for feature in tier.features %}
           <li>{{ feature }}</li>
           {% endfor %}
         </ul>
-        <a class="btn btn-primary" href="{% url 'register' %}">{{ tier.cta }}</a>
+        {% if tier.name == "Premium" %}
+          <button class="btn btn-primary" type="button" data-bs-toggle="modal" data-bs-target="#checkoutModal">
+            Upgrade with Razorpay
+          </button>
+        {% else %}
+          <a class="btn btn-outline-primary" href="{% url 'register' %}">{{ tier.cta }}</a>
+        {% endif %}
       </div>
       {% endfor %}
     </div>
-    <div class="notice">
-      <strong>Payments:</strong> Premium upgrades are processed through Razorpay. Normal users keep full access to core
-      shortening features with AdSense placements.
+
+    <div class="notice mt-4">
+      <strong>Razorpay checkout:</strong> Premium upgrades are processed via Razorpay. Use the checkout modal below to integrate
+      your Razorpay order ID and key.
     </div>
   </div>
 </section>
+
+<!-- Razorpay checkout modal integration point. -->
+<div class="modal fade" id="checkoutModal" tabindex="-1" aria-labelledby="checkoutModalLabel" aria-hidden="true">
+  <div class="modal-dialog modal-dialog-centered">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="checkoutModalLabel">Complete your upgrade</h5>
+        <button class="btn-close" type="button" data-bs-dismiss="modal" aria-label="Close"></button>
+      </div>
+      <div class="modal-body">
+        <p class="text-muted">Replace the placeholders with your Razorpay order ID and checkout script.</p>
+        <div class="card-outline">
+          <p class="mb-1"><strong>Order ID:</strong> <code>razorpay_order_XXXX</code></p>
+          <p class="mb-0"><strong>Amount:</strong> ₹999 / month</p>
+        </div>
+        <div class="ad-slot mt-3">Checkout preview / Razorpay button</div>
+      </div>
+      <div class="modal-footer">
+        <button class="btn btn-outline-secondary" type="button" data-bs-dismiss="modal">Cancel</button>
+        <button class="btn btn-primary" type="button">Proceed to Razorpay</button>
+      </div>
+    </div>
+  </div>
+</div>
 {% endblock %}
