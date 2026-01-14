@@ -3,23 +3,50 @@
 {% block title %}API keys | genieURL{% endblock %}
 
 {% block content %}
-<div class="container mt-4">
-  <div class="card p-4">
-    <h3>API access</h3>
-    {% if is_premium %}
-      <p class="text-muted">Use this API key with the REST endpoints.</p>
-      {% if api_key %}
-        <div class="alert alert-secondary">{{ api_key }}</div>
-      {% else %}
-        <p>No API key yet.</p>
-      {% endif %}
-      <form method="post">
-        {% csrf_token %}
-        <button class="btn btn-primary" type="submit">Generate API key</button>
-      </form>
-    {% else %}
-      <p class="text-muted">Upgrade to premium to unlock API access.</p>
-    {% endif %}
+<section class="section">
+  <div class="container">
+    <div class="section-header mb-4">
+      <div>
+        <h2 class="mb-1">Developer docs & API keys</h2>
+        <p class="text-muted">Integrate genieURL into your product with secure API access.</p>
+      </div>
+      <a class="btn btn-outline-primary" href="{% url 'pricing' %}">Upgrade to premium</a>
+    </div>
+    <div class="row g-4">
+      <div class="col-lg-7">
+        <div class="surface-card">
+          <h4>API access</h4>
+          {% if is_premium %}
+            <p class="text-muted">Use this API key with the REST endpoints. Keep it secret.</p>
+            {% if api_key %}
+              <div class="alert alert-secondary">{{ api_key }}</div>
+            {% else %}
+              <p class="text-muted">No API key yet.</p>
+            {% endif %}
+            <form method="post">
+              {% csrf_token %}
+              <button class="btn btn-primary" type="submit">Generate API key</button>
+            </form>
+          {% else %}
+            <p class="text-muted">Upgrade to premium to unlock API access and rate limit controls.</p>
+          {% endif %}
+        </div>
+      </div>
+      <div class="col-lg-5">
+        <div class="surface-card">
+          <h4>Quick start</h4>
+          <p class="text-muted">Create a short link with curl:</p>
+          <div class="card-outline">
+            <code>
+              curl -X POST https://genieurl.com/api/links \
+              -H "X-API-Key: YOUR_KEY" \
+              -d '{"destination_url":"https://example.com"}'
+            </code>
+          </div>
+          <p class="text-muted mt-3">Replace <strong>YOUR_KEY</strong> with the API key above.</p>
+        </div>
+      </div>
+    </div>
   </div>
-</div>
+</section>
 {% endblock %}

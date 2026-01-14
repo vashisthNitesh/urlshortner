@@ -1,0 +1,19 @@
+{% extends "base.html" %}
+
+{% block title %}Payment confirmed | genieURL{% endblock %}
+
+{% block content %}
+<section class="section">
+  <div class="container">
+    <div class="surface-card text-center">
+      <h1>Payment confirmed ✅</h1>
+      <p class="lead">Your premium plan is active. Enjoy ad-free analytics and custom domains.</p>
+      <div class="notice success">A receipt has been emailed to you.</div>
+      <div class="d-flex justify-content-center gap-2 mt-3">
+        <a class="btn btn-primary" href="{% url 'dashboard' %}">Go to dashboard</a>
+        <a class="btn btn-outline-secondary" href="{% url 'billing' %}">Manage billing</a>
+      </div>
+    </div>
+  </div>
+</section>
+{% endblock %}

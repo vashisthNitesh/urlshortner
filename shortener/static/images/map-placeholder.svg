@@ -1,0 +1,9 @@
+<svg width="560" height="320" viewBox="0 0 560 320" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <rect width="560" height="320" rx="24" fill="#F8FAFC"/>
+  <path d="M92 200C140 150 220 150 268 200C316 250 396 250 444 200" stroke="#CBD5F5" stroke-width="12" stroke-linecap="round"/>
+  <path d="M80 120C150 80 250 80 320 120C390 160 470 160 540 120" stroke="#E2E8F0" stroke-width="10" stroke-linecap="round"/>
+  <circle cx="160" cy="140" r="12" fill="#4F46E5"/>
+  <circle cx="280" cy="190" r="12" fill="#06B6D4"/>
+  <circle cx="400" cy="150" r="12" fill="#7C3AED"/>
+  <text x="28" y="46" fill="#64748B" font-family="Manrope" font-size="16">Global click distribution</text>
+</svg>

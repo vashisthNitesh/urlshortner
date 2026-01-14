@@ -1,88 +1,185 @@
 {% extends "base.html" %}
+{% load static %}
 
 {% block title %}Link analytics | genieURL{% endblock %}
 
 {% block content %}
-<div class="container mt-4">
-  <div class="d-flex justify-content-between align-items-center mb-3">
-    <div>
-      <h2>{{ link.title|default:link.slug }}</h2>
-      <p class="text-muted">{{ link.destination_url }}</p>
-    </div>
-    <a class="btn btn-outline-primary" href="{% url 'link_edit' link.slug %}">Edit link</a>
-  </div>
-
-  <div class="row g-4">
-    <div class="col-lg-4">
-      <div class="card p-4">
-        <h5>Total clicks</h5>
-        <h2>{{ totals }}</h2>
-        <p class="text-muted">Redirect type: {{ link.get_redirect_type_display }}</p>
-        {% if link.qr_code_image %}
-          <img class="qr-preview mt-3" src="{{ link.qr_code_image.url }}" alt="QR code" />
-        {% endif %}
+<section class="section">
+  <div class="container">
+    <div class="d-flex flex-column flex-md-row justify-content-between align-items-md-center mb-4 gap-3">
+      <div>
+        <h2 class="mb-1">{{ link.title|default:link.slug }}</h2>
+        <p class="text-muted mb-0">{{ link.destination_url }}</p>
+      </div>
+      <div class="d-flex gap-2">
+        <a class="btn btn-outline-secondary" href="{% url 'dashboard' %}">Back to dashboard</a>
+        <a class="btn btn-outline-primary" href="{% url 'link_edit' link.slug %}">Edit link</a>
       </div>
     </div>
-    <div class="col-lg-8">
-      <div class="card p-4">
-        <h5>Clicks over time</h5>
-        {% if is_premium %}
-          <canvas id="clickChart"></canvas>
-          <script>
-            const chartCtx = document.getElementById('clickChart');
-            const clickData = {{ by_date|safe }};
-            const labels = clickData.map(item => item.date);
-            const data = clickData.map(item => item.count);
-            new Chart(chartCtx, {
-              type: 'line',
-              data: {
-                labels: labels,
-                datasets: [{
-                  label: 'Clicks',
-                  data: data,
-                  borderColor: '#4f46e5',
-                  backgroundColor: 'rgba(79,70,229,0.2)',
-                  tension: 0.3
-                }]
-              }
-            });
-          </script>
-        {% else %}
-          <p class="text-muted">Upgrade to premium to see charts and full analytics.</p>
-        {% endif %}
+
+    <div class="row g-4">
+      <div class="col-lg-4">
+        <div class="surface-card">
+          <h5 class="mb-2">Total clicks</h5>
+          <h2 class="mb-2">{{ totals }}</h2>
+          <p class="text-muted">Redirect type: {{ link.get_redirect_type_display }}</p>
+          {% if link.qr_code_image %}
+            <img class="qr-preview mt-3" src="{{ link.qr_code_image.url }}" alt="QR code" />
+          {% else %}
+            <img class="qr-preview mt-3" src="{% static 'images/qr-placeholder.svg' %}" alt="QR code preview" />
+          {% endif %}
+        </div>
+      </div>
+      <div class="col-lg-8">
+        <div class="surface-card h-100">
+          <h5 class="mb-3">Clicks over time</h5>
+          {% if is_premium %}
+            <canvas id="clickChart" height="140"></canvas>
+          {% else %}
+            <p class="text-muted">Upgrade to premium to unlock charting and advanced analytics.</p>
+          {% endif %}
+        </div>
       </div>
     </div>
-  </div>
 
-  <div class="row g-4 mt-3">
-    <div class="col-lg-6">
-      <div class="card p-4">
-        <h5>Top referrers</h5>
-        {% if is_premium %}
-          <ul>
-            {% for referrer, count in referrers %}
-              <li>{{ referrer }} - {{ count }}</li>
+    <div class="row g-4 mt-1">
+      <div class="col-lg-4">
+        <div class="surface-card h-100">
+          <h5 class="mb-3">Top referrers</h5>
+          {% if is_premium %}
+            <ul class="mb-0">
+              {% for referrer, count in referrers %}
+                <li class="d-flex justify-content-between">
+                  <span>{{ referrer }}</span>
+                  <span class="text-muted">{{ count }}</span>
+                </li>
+              {% empty %}
+                <li class="text-muted">No referrer data yet.</li>
+              {% endfor %}
+            </ul>
+          {% else %}
+            <p class="text-muted">Upgrade to premium to see referrer insights.</p>
+          {% endif %}
+        </div>
+      </div>
+      <div class="col-lg-4">
+        <div class="surface-card h-100">
+          <h5 class="mb-3">Device share</h5>
+          {% if is_premium %}
+            <canvas id="deviceChart" height="180"></canvas>
+          {% else %}
+            <p class="text-muted">Upgrade to premium to see device analytics.</p>
+          {% endif %}
+        </div>
+      </div>
+      <div class="col-lg-4">
+        <div class="surface-card h-100">
+          <h5 class="mb-3">Browser split</h5>
+          {% if is_premium %}
+            <canvas id="browserChart" height="180"></canvas>
+          {% else %}
+            <p class="text-muted">Upgrade to premium to see browser analytics.</p>
+          {% endif %}
+        </div>
+      </div>
+    </div>
+
+    <div class="row g-4 mt-1">
+      <div class="col-lg-7">
+        <div class="surface-card h-100">
+          <h5 class="mb-3">Clicks by country</h5>
+          <img class="img-fluid rounded" src="{% static 'images/map-placeholder.svg' %}" alt="Map showing click distribution" />
+          <ul class="mt-3 mb-0">
+            {% for country in country_counts %}
+              <li class="d-flex justify-content-between">
+                <span>{{ country.country|default:"Unknown" }}</span>
+                <span class="text-muted">{{ country.count }}</span>
+              </li>
             {% empty %}
-              <li>No referrer data yet.</li>
+              <li class="text-muted">No geographic data yet.</li>
             {% endfor %}
           </ul>
-        {% else %}
-          <p class="text-muted">Upgrade to premium to see referrer insights.</p>
-        {% endif %}
+        </div>
       </div>
-    </div>
-    <div class="col-lg-6">
-      <div class="card p-4">
-        <h5>Recent clicks</h5>
-        <ul>
-          {% for click in clicks %}
-            <li>{{ click.created_at }} · {{ click.device }} · {{ click.browser }} · {{ click.country }}</li>
-          {% empty %}
-            <li>No clicks yet.</li>
-          {% endfor %}
-        </ul>
+      <div class="col-lg-5">
+        <div class="surface-card h-100">
+          <h5 class="mb-3">Recent clicks</h5>
+          <ul class="mb-0">
+            {% for click in clicks %}
+              <li class="mb-2">
+                <div class="fw-semibold">{{ click.created_at|date:"M d, H:i" }}</div>
+                <div class="text-muted small">{{ click.device }} · {{ click.browser }} · {{ click.country|default:"Unknown" }}</div>
+              </li>
+            {% empty %}
+              <li class="text-muted">No clicks yet.</li>
+            {% endfor %}
+          </ul>
+        </div>
       </div>
     </div>
   </div>
-</div>
+</section>
+{% endblock %}
+
+{% block extra_scripts %}
+{% if is_premium %}
+<script>
+  const chartCtx = document.getElementById('clickChart');
+  const clickData = {{ by_date|safe }};
+  const labels = clickData.map(item => item.date);
+  const data = clickData.map(item => item.count);
+  if (chartCtx) {
+    new Chart(chartCtx, {
+      type: 'line',
+      data: {
+        labels: labels,
+        datasets: [{
+          label: 'Clicks',
+          data: data,
+          borderColor: '#4f46e5',
+          backgroundColor: 'rgba(79,70,229,0.2)',
+          tension: 0.3,
+          fill: true
+        }]
+      },
+      options: {
+        plugins: { legend: { display: false } },
+        scales: { y: { beginAtZero: true } }
+      }
+    });
+  }
+
+  const deviceCanvas = document.getElementById('deviceChart');
+  if (deviceCanvas) {
+    const deviceData = {{ device_counts|safe }};
+    new Chart(deviceCanvas, {
+      type: 'doughnut',
+      data: {
+        labels: deviceData.map((item) => item.device || 'Unknown'),
+        datasets: [{
+          data: deviceData.map((item) => item.count),
+          backgroundColor: ['#4f46e5', '#06b6d4', '#7c3aed', '#f97316']
+        }]
+      },
+      options: { plugins: { legend: { position: 'bottom' } } }
+    });
+  }
+
+  const browserCanvas = document.getElementById('browserChart');
+  if (browserCanvas) {
+    const browserData = {{ browser_counts|safe }};
+    new Chart(browserCanvas, {
+      type: 'doughnut',
+      data: {
+        labels: browserData.map((item) => item.browser || 'Other'),
+        datasets: [{
+          data: browserData.map((item) => item.count),
+          backgroundColor: ['#0ea5e9', '#f97316', '#10b981', '#6366f1']
+        }]
+      },
+      options: { plugins: { legend: { position: 'bottom' } } }
+    });
+  }
+</script>
+{% endif %}
 {% endblock %}

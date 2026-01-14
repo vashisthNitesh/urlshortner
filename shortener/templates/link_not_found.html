@@ -1,0 +1,19 @@
+{% extends "base.html" %}
+
+{% block title %}Link not found | genieURL{% endblock %}
+
+{% block content %}
+<section class="section">
+  <div class="container">
+    <div class="surface-card text-center">
+      <h1>Link not found</h1>
+      <p class="lead">This short URL may be expired, disabled, or misspelled.</p>
+      <p class="text-muted">Create a new link or contact support if you expected this link to work.</p>
+      <div class="d-flex justify-content-center gap-2 mt-3">
+        <a class="btn btn-primary" href="{% url 'home' %}#shorten">Create a new link</a>
+        <a class="btn btn-outline-secondary" href="mailto:support@genieurl.com">Contact support</a>
+      </div>
+    </div>
+  </div>
+</section>
+{% endblock %}
