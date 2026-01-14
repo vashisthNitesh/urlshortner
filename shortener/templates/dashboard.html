@@ -12,8 +12,8 @@
         <p class="muted">Create and manage short links. Active plan: <strong>{{ plan }}</strong>.</p>
       </div>
       <div class="plan-switcher">
-        <a class="btn{% if not is_premium %} btn-primary{% endif %}" href="{{ url('dashboard') }}?plan=normal">Normal user</a>
-        <a class="btn{% if is_premium %} btn-primary{% endif %}" href="{{ url('dashboard') }}?plan=premium">Premium user</a>
+        <a class="btn{% if not is_premium %} btn-primary{% endif %}" href="{% url 'dashboard' %}?plan=normal">Normal user</a>
+        <a class="btn{% if is_premium %} btn-primary{% endif %}" href="{% url 'dashboard' %}?plan=premium">Premium user</a>
       </div>
     </div>
     <div class="grid-two">
@@ -23,7 +23,7 @@
         <div class="notice success">Link created! Share /r/{{ success_slug }}.</div>
         {% endif %}
         <form method="post">
-          {{ csrf_input() }}
+          {% csrf_token %}
           {{ form.non_field_errors }}
           <input type="hidden" name="plan" value="{{ plan|lower }}" />
           <label for="id_url">Destination URL</label>
@@ -41,7 +41,7 @@
             <li>Premium users unlock branded domains, QR codes, and exportable reports.</li>
             <li>Upgrade anytime via Razorpay checkout.</li>
           </ul>
-          <a class="btn-secondary" href="{{ url('pricing') }}">Review plan details</a>
+          <a class="btn-secondary" href="{% url 'pricing' %}">Review plan details</a>
         </div>
       </div>
       <div class="card">
@@ -50,12 +50,12 @@
           {% for link in links %}
           <li>
             <div>
-              <strong>{{ link.title or link.slug }}</strong>
+              <strong>{{ link.title|default:link.slug }}</strong>
               <span>/r/{{ link.slug }}</span>
             </div>
-            <a class="btn" href="{{ url('redirect', slug=link.slug) }}" target="_blank">Open</a>
+            <a class="btn" href="{% url 'redirect' slug=link.slug %}" target="_blank">Open</a>
           </li>
-          {% else %}
+          {% empty %}
           <li class="muted">No links created yet.</li>
           {% endfor %}
         </ul>
@@ -71,7 +71,7 @@
           and redirect previews.
         </p>
       </div>
-      <a class="btn-primary" href="{{ url('pricing') }}">Upgrade with Razorpay</a>
+      <a class="btn-primary" href="{% url 'pricing' %}">Upgrade with Razorpay</a>
     </div>
     {% else %}
     <div class="notice success">
