@@ -5,15 +5,15 @@
 {% block content %}
 <section class="section">
   <div class="container">
-    <div class="section-header mb-4">
+    <div class="section-head">
       <div>
-        <h2 class="mb-1">Custom domains</h2>
-        <p class="text-muted">Serve branded links from your own domain with SSL security.</p>
+        <h2 class="section-title">Custom domains</h2>
+        <p class="section-subtitle">Serve branded links from your own domain with SSL security.</p>
       </div>
       <a class="btn btn-outline-primary" href="{% url 'billing' %}">Manage billing</a>
     </div>
 
-    <div class="surface-card">
+    <div class="card">
       {% if is_premium %}
         <form method="post" class="row g-3 align-items-end">
           {% csrf_token %}
@@ -26,18 +26,18 @@
           </div>
         </form>
         <hr />
-        <ul class="list-group list-group-flush">
+        <ul class="mb-0">
           {% for domain in domains %}
-            <li class="list-group-item d-flex justify-content-between align-items-center">
+            <li class="d-flex justify-content-between align-items-center py-2">
               <span>{{ domain.domain }}</span>
               {% if domain.is_verified %}
-                <span class="badge bg-success">Verified</span>
+                <span class="badge-soft">Verified</span>
               {% else %}
-                <span class="badge bg-warning text-dark">Pending verification</span>
+                <span class="badge-soft">Pending verification</span>
               {% endif %}
             </li>
           {% empty %}
-            <li class="list-group-item text-muted">No custom domains yet.</li>
+            <li class="text-muted">No custom domains yet.</li>
           {% endfor %}
         </ul>
       {% else %}

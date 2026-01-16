@@ -5,11 +5,11 @@
 {% block content %}
 <section class="section">
   <div class="container">
-    <div class="surface-card text-center">
+    <div class="card text-center">
       <h1>Link not found</h1>
-      <p class="lead">This short URL may be expired, disabled, or misspelled.</p>
+      <p class="section-subtitle">This short URL may be expired, disabled, or misspelled.</p>
       <p class="text-muted">Create a new link or contact support if you expected this link to work.</p>
-      <div class="d-flex justify-content-center gap-2 mt-3">
+      <div class="d-flex justify-content-center gap-2 mt-3 flex-wrap">
         <a class="btn btn-primary" href="{% url 'home' %}#shorten">Create a new link</a>
         <a class="btn btn-outline-secondary" href="mailto:support@genieurl.com">Contact support</a>
       </div>

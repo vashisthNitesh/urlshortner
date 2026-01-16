@@ -8,7 +8,7 @@
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
     <link
-      href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700;800&family=Space+Grotesk:wght@500;600;700&display=swap"
+      href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=Space+Grotesk:wght@500;600;700&display=swap"
       rel="stylesheet"
     />
     <link
@@ -21,48 +21,30 @@
   </head>
   <body>
     <a class="skip-link" href="#main-content">Skip to content</a>
-    <header class="site-header navbar navbar-expand-lg navbar-light sticky-top" aria-label="Primary">
-      <div class="container">
-        <a class="navbar-brand logo" href="{% url 'home' %}">
-          <span class="logo-mark">genie</span>URL
+    <header class="site-header" aria-label="Primary">
+      <div class="container header-inner">
+        <a class="brand" href="{% url 'home' %}">
+          <span class="brand-mark">gU</span>
+          <span>genieURL</span>
         </a>
-        <button
-          class="navbar-toggler"
-          type="button"
-          data-bs-toggle="collapse"
-          data-bs-target="#navMenu"
-          aria-controls="navMenu"
-          aria-expanded="false"
-          aria-label="Toggle navigation"
-        >
-          <span class="navbar-toggler-icon"></span>
-        </button>
-        <div class="collapse navbar-collapse" id="navMenu">
-          <nav class="navbar-nav me-auto">
-            <a class="nav-link" href="{% url 'home' %}#shorten">Create</a>
-            <a class="nav-link" href="{% url 'dashboard' %}">Dashboard</a>
-            <a class="nav-link" href="{% url 'pricing' %}">Pricing</a>
-            <a class="nav-link" href="{% url 'api_keys' %}">Docs</a>
-            <a class="nav-link" href="{% url 'home' %}#contact">Contact</a>
-          </nav>
-          <div class="d-flex gap-2 align-items-center nav-actions">
-            <button
-              class="btn btn-outline-secondary btn-sm theme-toggle"
-              id="themeToggle"
-              type="button"
-              aria-label="Toggle dark mode"
-            >
-              <span aria-hidden="true">🌙</span>
-              <span class="d-none d-md-inline">Theme</span>
-            </button>
-            {% if user.is_authenticated %}
-              <span class="text-muted small d-none d-md-inline">Hi {{ user.username }}</span>
-              <a class="btn btn-outline-primary btn-sm" href="{% url 'logout' %}">Logout</a>
-            {% else %}
-              <a class="btn btn-outline-primary btn-sm" href="{% url 'login' %}">Login</a>
-              <a class="btn btn-primary btn-sm" href="{% url 'register' %}">Start free</a>
-            {% endif %}
-          </div>
+        <nav class="nav-links">
+          <a class="nav-link" href="{% url 'home' %}#shorten">Create</a>
+          <a class="nav-link" href="{% url 'dashboard' %}">Dashboard</a>
+          <a class="nav-link" href="{% url 'pricing' %}">Pricing</a>
+          <a class="nav-link" href="{% url 'api_keys' %}">Docs</a>
+          <a class="nav-link" href="{% url 'home' %}#contact">Contact</a>
+        </nav>
+        <div class="nav-actions">
+          <button class="btn btn-outline-secondary btn-sm" id="themeToggle" type="button" aria-label="Toggle dark mode">
+            🌙 Theme
+          </button>
+          {% if user.is_authenticated %}
+            <span class="text-muted small d-none d-md-inline">Hi {{ user.username }}</span>
+            <a class="btn btn-outline-primary btn-sm" href="{% url 'logout' %}">Logout</a>
+          {% else %}
+            <a class="btn btn-outline-primary btn-sm" href="{% url 'login' %}">Login</a>
+            <a class="btn btn-primary btn-sm" href="{% url 'register' %}">Start free</a>
+          {% endif %}
         </div>
       </div>
     </header>
@@ -79,8 +61,8 @@
     <footer class="site-footer">
       <div class="container">
         <div>
-          <p class="mb-1">© 2024 genieURL. Built with Django.</p>
-          <p class="text-muted small mb-0">Better links, smarter analytics, and a friendlier web.</p>
+          <p class="mb-1">© 2024 genieURL. Built for human-friendly links.</p>
+          <p class="text-muted small mb-0">Fast redirects, thoughtful analytics, and brand control in one place.</p>
         </div>
         <div class="footer-links">
           <a href="{% url 'terms' %}">Terms</a>
