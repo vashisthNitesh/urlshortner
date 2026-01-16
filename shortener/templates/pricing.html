@@ -5,47 +5,46 @@
 {% block content %}
 <section class="section">
   <div class="container">
-    <div class="section-header mb-4">
+    <div class="section-head">
       <div>
-        <p class="text-uppercase text-muted small mb-2">Pricing</p>
-        <h1 class="section-title">Flexible plans for every team.</h1>
-        <p class="lead">Start free, then scale with premium analytics and custom domains.</p>
+        <p class="eyebrow">Pricing</p>
+        <h1 class="section-title">Plans that flex with your growth.</h1>
+        <p class="section-subtitle">Start free, then scale with premium analytics, custom domains, and advanced controls.</p>
       </div>
       <div class="d-flex gap-2">
-        <button class="btn btn-outline-secondary">Monthly</button>
-        <button class="btn btn-outline-secondary">Yearly</button>
+        <button class="btn btn-outline-secondary" type="button">Monthly</button>
+        <button class="btn btn-outline-secondary" type="button">Yearly</button>
       </div>
     </div>
 
     <div class="pricing-grid">
       {% for tier in tiers %}
-      <div class="surface-card">
-        <h3>{{ tier.name }}</h3>
-        <p class="price mb-2">{{ tier.price }}<span class="text-muted small">/month</span></p>
-        <ul class="text-muted">
-          {% for feature in tier.features %}
-          <li>{{ feature }}</li>
-          {% endfor %}
-        </ul>
-        {% if tier.name == "Premium" %}
-          <button class="btn btn-primary" type="button" data-bs-toggle="modal" data-bs-target="#checkoutModal">
-            Upgrade with Razorpay
-          </button>
-        {% else %}
-          <a class="btn btn-outline-primary" href="{% url 'register' %}">{{ tier.cta }}</a>
-        {% endif %}
-      </div>
+        <div class="card">
+          <h3>{{ tier.name }}</h3>
+          <p class="h2 fw-bold mb-2">{{ tier.price }}<span class="text-muted small">/month</span></p>
+          <ul class="text-muted">
+            {% for feature in tier.features %}
+              <li>{{ feature }}</li>
+            {% endfor %}
+          </ul>
+          {% if tier.name == "Premium" %}
+            <button class="btn btn-primary" type="button" data-bs-toggle="modal" data-bs-target="#checkoutModal">
+              Upgrade with Razorpay
+            </button>
+          {% else %}
+            <a class="btn btn-outline-primary" href="{% url 'register' %}">{{ tier.cta }}</a>
+          {% endif %}
+        </div>
       {% endfor %}
     </div>
 
-    <div class="notice mt-4">
+    <div class="notice">
       <strong>Razorpay checkout:</strong> Premium upgrades are processed via Razorpay. Use the checkout modal below to integrate
       your Razorpay order ID and key.
     </div>
   </div>
 </section>
 
-<!-- Razorpay checkout modal integration point. -->
 <div class="modal fade" id="checkoutModal" tabindex="-1" aria-labelledby="checkoutModalLabel" aria-hidden="true">
   <div class="modal-dialog modal-dialog-centered">
     <div class="modal-content">

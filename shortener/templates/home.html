@@ -4,255 +4,206 @@
 {% block title %}genieURL | Home{% endblock %}
 
 {% block content %}
-<section class="relative overflow-hidden bg-white" id="shorten">
-  <div class="container mx-auto px-4 py-16 lg:py-24">
-    <div class="grid items-center gap-12 lg:grid-cols-2">
-      <div>
-        <!-- Hero messaging focuses on the primary value prop and a clear visual hierarchy. -->
-        <span class="inline-flex items-center rounded-full bg-[#F3E8FF] px-4 py-1 text-xs font-semibold uppercase tracking-[0.2em] text-[#6E00FF]">Next-gen short links</span>
-        <h1 class="mt-6 text-4xl font-bold leading-tight text-[#1A1A1A] sm:text-5xl lg:text-6xl">
-          Make every link magical with branded, trackable, and secure short URLs.
-        </h1>
-        <p class="mt-5 max-w-xl text-base font-medium text-[#6B6B6B] sm:text-lg">
-          genieURL gives you lightning-fast redirects, campaign-ready tracking, and premium insights that look beautiful on every device.
-        </p>
-        <div class="mt-8 flex flex-wrap gap-4">
-          <a class="inline-flex items-center justify-center rounded-full bg-[#1A1A1A] px-6 py-3 text-sm font-semibold uppercase tracking-wide text-white shadow-sm transition hover:-translate-y-0.5 hover:shadow-lg" href="{% url 'register' %}">
-            Get started free
-          </a>
-          <a class="inline-flex items-center justify-center rounded-full border border-[#E2E4EA] bg-white px-6 py-3 text-sm font-semibold uppercase tracking-wide text-[#1A1A1A] transition hover:border-[#A259FF] hover:text-[#6E00FF]" href="{% url 'pricing' %}">
-            See pricing
-          </a>
-        </div>
-        <div class="mt-8 flex flex-wrap gap-3 text-xs font-semibold text-[#6B6B6B]">
-          <span class="rounded-full bg-[#F7F8FA] px-4 py-2">99.9% uptime SLA</span>
-          <span class="rounded-full bg-[#F7F8FA] px-4 py-2">GDPR ready</span>
-          <span class="rounded-full bg-[#F7F8FA] px-4 py-2">Built-in QR codes</span>
-        </div>
+<section class="hero" id="shorten">
+  <div class="container hero-grid">
+    <div>
+      <p class="eyebrow">Next-gen short links</p>
+      <h1 class="section-title">Magnetic short links for teams that move fast.</h1>
+      <p class="section-subtitle">
+        Build branded, trackable links with instant redirects, smart QR codes, and privacy-first analytics across every channel.
+      </p>
+      <div class="d-flex flex-wrap gap-3 mt-4">
+        <a class="btn btn-primary" href="{% url 'register' %}">Start for free</a>
+        <a class="btn btn-outline-secondary" href="{% url 'pricing' %}">See pricing</a>
       </div>
+      <div class="d-flex flex-wrap gap-2 mt-4">
+        <span class="badge-soft">99.9% uptime SLA</span>
+        <span class="badge-soft">GDPR ready</span>
+        <span class="badge-soft">QR codes included</span>
+      </div>
+    </div>
 
-      <div class="relative">
-        <!-- Premium card keeps the primary task front-and-center. -->
-        <div class="rounded-3xl border border-[#ECEFF4] bg-white p-6 shadow-[0_24px_60px_-40px_rgba(90,24,154,0.55)] sm:p-8">
-          <div class="mb-6">
-            <h3 class="text-xl font-semibold text-[#1A1A1A]">Shorten a link instantly</h3>
-            <p class="mt-2 text-sm text-[#6B6B6B]">Create a branded short URL in seconds and keep your history in one place.</p>
-          </div>
-          <form method="post" class="space-y-5" novalidate>
-            {% csrf_token %}
-            {% if form.non_field_errors %}
-              <div class="rounded-xl border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-600">
-                {{ form.non_field_errors }}
-              </div>
-            {% endif %}
-            <div>
-              <label class="text-xs font-semibold uppercase tracking-wide text-[#6B6B6B]" for="id_destination_url">Long URL</label>
-              <input
-                class="mt-2 w-full rounded-2xl border border-transparent bg-[#F7F8FA] px-4 py-3 text-sm text-[#1A1A1A] placeholder:text-[#9CA3AF] shadow-sm transition focus:border-[#A259FF] focus:outline-none focus:ring-2 focus:ring-[#CDB7FF]{% if form.destination_url.errors %} border-red-300 ring-2 ring-red-200{% endif %}"
-                id="id_destination_url"
-                name="destination_url"
-                type="url"
-                placeholder="https://your-long-link.com/launch" 
-                value="{{ form.destination_url.value|default_if_none:'' }}"
-                required
-              />
-              {% if form.destination_url.errors %}
-                <p class="mt-2 text-xs font-semibold text-red-600">{{ form.destination_url.errors|striptags }}</p>
-              {% endif %}
-            </div>
-            <div class="grid gap-5 sm:grid-cols-2">
-              <div>
-                <label class="text-xs font-semibold uppercase tracking-wide text-[#6B6B6B]" for="id_slug">Custom alias (optional)</label>
-                <input
-                  class="mt-2 w-full rounded-2xl border border-transparent bg-[#F7F8FA] px-4 py-3 text-sm text-[#1A1A1A] placeholder:text-[#9CA3AF] shadow-sm transition focus:border-[#A259FF] focus:outline-none focus:ring-2 focus:ring-[#CDB7FF]"
-                  id="id_slug"
-                  name="slug"
-                  type="text"
-                  placeholder="e.g. launch-day"
-                  value="{{ form.slug.value|default_if_none:'' }}"
-                />
-              </div>
-              <div>
-                <label class="text-xs font-semibold uppercase tracking-wide text-[#6B6B6B]" for="id_email">Email for history</label>
-                <input
-                  class="mt-2 w-full rounded-2xl border border-transparent bg-[#F7F8FA] px-4 py-3 text-sm text-[#1A1A1A] placeholder:text-[#9CA3AF] shadow-sm transition focus:border-[#A259FF] focus:outline-none focus:ring-2 focus:ring-[#CDB7FF]"
-                  id="id_email"
-                  name="email"
-                  type="email"
-                  placeholder="you@company.com"
-                  value="{{ form.email.value|default_if_none:'' }}"
-                  required
-                />
-              </div>
-            </div>
-            <div>
-              <label class="text-xs font-semibold uppercase tracking-wide text-[#6B6B6B]" for="id_captcha">Quick verification</label>
-              <input
-                class="mt-2 w-full rounded-2xl border border-transparent bg-[#F7F8FA] px-4 py-3 text-sm text-[#1A1A1A] placeholder:text-[#9CA3AF] shadow-sm transition focus:border-[#A259FF] focus:outline-none focus:ring-2 focus:ring-[#CDB7FF]{% if form.captcha.errors %} border-red-300 ring-2 ring-red-200{% endif %}"
-                id="id_captcha"
-                name="captcha"
-                type="number"
-                placeholder="What is 3 + 4?"
-                value="{{ form.captcha.value|default_if_none:'' }}"
-                required
-              />
-              <p class="mt-2 text-xs text-[#9CA3AF]">We use a lightweight check to keep bots away.</p>
-              {% if form.captcha.errors %}
-                <p class="mt-2 text-xs font-semibold text-red-600">{{ form.captcha.errors|striptags }}</p>
-              {% endif %}
-            </div>
-            <button class="w-full rounded-2xl bg-gradient-to-r from-[#A259FF] to-[#6E00FF] px-6 py-4 text-xs font-bold uppercase tracking-[0.2em] text-white shadow-[0_16px_30px_-20px_rgba(110,0,255,0.8)] transition hover:-translate-y-0.5 hover:shadow-[0_20px_34px_-18px_rgba(110,0,255,0.85)] focus:outline-none focus:ring-2 focus:ring-[#CDB7FF]" type="submit">
-              Shorten URL
-            </button>
-          </form>
-
-          {% if created_short_url %}
-          <div class="mt-6 rounded-2xl border border-[#E4D9FF] bg-[#F8F5FF] p-4" aria-live="polite">
-            <div class="flex flex-wrap items-start justify-between gap-3">
-              <div>
-                <p class="text-sm font-semibold text-[#1A1A1A]">Short link ready</p>
-                <p class="mt-1 text-sm text-[#6E00FF]"><a class="underline decoration-[#CDB7FF]" href="{{ created_short_url }}">{{ created_short_url }}</a></p>
-              </div>
-              <button class="rounded-full border border-[#A259FF] px-4 py-2 text-xs font-semibold uppercase tracking-wide text-[#6E00FF] transition hover:bg-[#A259FF]/10" type="button" data-copy="{{ created_short_url }}">Copy</button>
-            </div>
-            <div class="mt-4 flex flex-wrap gap-2 text-xs font-semibold text-[#6B6B6B]">
-              <span class="rounded-full bg-white px-3 py-1">🔒 Secure redirect</span>
-              <span class="rounded-full bg-white px-3 py-1">📊 Analytics enabled</span>
-            </div>
-          </div>
-          <div class="mt-4 flex items-center gap-4">
-            <img class="h-16 w-16 rounded-2xl bg-white p-2 shadow-sm" src="{% static 'images/qr-placeholder.svg' %}" alt="QR code preview" />
-            <div>
-              <p class="text-sm font-semibold text-[#1A1A1A]">Share instantly</p>
-              <p class="text-xs text-[#6B6B6B]">Download QR codes and branded short links on the free plan.</p>
-            </div>
-          </div>
-          {% endif %}
-
-          {% if not user.is_authenticated %}
-            <div class="mt-5 rounded-2xl border border-dashed border-[#E2E4EA] bg-[#FBFBFD] px-4 py-3 text-xs text-[#9CA3AF]">
-              Ad slot (Google AdSense / sponsor banner)
-            </div>
+    <div class="hero-card">
+      <div class="mb-4">
+        <h3 class="mb-2">Shorten a link instantly</h3>
+        <p class="text-muted">Create a branded short URL and keep every campaign in one place.</p>
+      </div>
+      <form method="post" class="d-grid gap-3" novalidate>
+        {% csrf_token %}
+        {% if form.non_field_errors %}
+          <div class="alert alert-danger">{{ form.non_field_errors }}</div>
+        {% endif %}
+        <div>
+          <label class="form-label" for="id_destination_url">Long URL</label>
+          <input
+            class="input{% if form.destination_url.errors %} border-danger{% endif %}"
+            id="id_destination_url"
+            name="destination_url"
+            type="url"
+            placeholder="https://your-long-link.com/launch"
+            value="{{ form.destination_url.value|default_if_none:'' }}"
+            required
+          />
+          {% if form.destination_url.errors %}
+            <div class="inline-error">{{ form.destination_url.errors|striptags }}</div>
           {% endif %}
         </div>
+        <div class="grid-two">
+          <div>
+            <label class="form-label" for="id_slug">Custom alias (optional)</label>
+            <input
+              class="input"
+              id="id_slug"
+              name="slug"
+              type="text"
+              placeholder="e.g. launch-day"
+              value="{{ form.slug.value|default_if_none:'' }}"
+            />
+          </div>
+          <div>
+            <label class="form-label" for="id_email">Email for history</label>
+            <input
+              class="input"
+              id="id_email"
+              name="email"
+              type="email"
+              placeholder="you@company.com"
+              value="{{ form.email.value|default_if_none:'' }}"
+              required
+            />
+          </div>
+        </div>
+        <div>
+          <label class="form-label" for="id_captcha">Quick verification</label>
+          <input
+            class="input{% if form.captcha.errors %} border-danger{% endif %}"
+            id="id_captcha"
+            name="captcha"
+            type="number"
+            placeholder="What is 3 + 4?"
+            value="{{ form.captcha.value|default_if_none:'' }}"
+            required
+          />
+          <div class="form-text">We use a lightweight check to keep bots away.</div>
+          {% if form.captcha.errors %}
+            <div class="inline-error">{{ form.captcha.errors|striptags }}</div>
+          {% endif %}
+        </div>
+        <button class="btn btn-primary" type="submit">Shorten URL</button>
+      </form>
+
+      {% if created_short_url %}
+        <div class="card-muted mt-4" aria-live="polite">
+          <div class="d-flex flex-wrap justify-content-between gap-3">
+            <div>
+              <p class="fw-semibold mb-1">Short link ready</p>
+              <p class="mb-0"><a href="{{ created_short_url }}">{{ created_short_url }}</a></p>
+            </div>
+            <button class="btn btn-outline-primary btn-sm" type="button" data-copy="{{ created_short_url }}">Copy</button>
+          </div>
+          <div class="d-flex flex-wrap gap-2 mt-3">
+            <span class="badge-soft">🔒 Secure redirect</span>
+            <span class="badge-soft">📊 Analytics enabled</span>
+          </div>
+          <div class="d-flex align-items-center gap-3 mt-3">
+            <img class="qr-preview" src="{% static 'images/qr-placeholder.svg' %}" alt="QR code preview" />
+            <div>
+              <p class="fw-semibold mb-1">Share instantly</p>
+              <p class="text-muted small mb-0">Download QR codes and branded short links on the free plan.</p>
+            </div>
+          </div>
+        </div>
+      {% endif %}
+
+      {% if not user.is_authenticated %}
+        <div class="ad-slot mt-4">Ad slot (Google AdSense / sponsor banner)</div>
+      {% endif %}
+    </div>
+  </div>
+</section>
+
+<section class="section section-muted">
+  <div class="container">
+    <div class="section-head">
+      <div>
+        <p class="eyebrow">How it works</p>
+        <h2 class="section-title">Paste. Shorten. Track. Repeat.</h2>
+      </div>
+      <a class="btn btn-outline-secondary" href="{% url 'dashboard' %}">Go to dashboard</a>
+    </div>
+    <div class="feature-grid">
+      <div class="card">
+        <h3>1. Paste your link</h3>
+        <p class="text-muted">Drop any long URL and genieURL preps it with smart metadata and safety checks.</p>
+      </div>
+      <div class="card">
+        <h3>2. Shorten & brand</h3>
+        <p class="text-muted">Pick a custom alias, add UTM tags, and keep everything aligned with your brand voice.</p>
+      </div>
+      <div class="card">
+        <h3>3. Track results</h3>
+        <p class="text-muted">Analyze clicks, devices, and referrers with dashboards tuned for quick decisions.</p>
       </div>
     </div>
   </div>
 </section>
 
-<section class="bg-[#F7F8FA] py-16">
-  <div class="container mx-auto px-4">
-    <!-- Steps are laid out as cards for clarity and scanability. -->
-    <div class="flex flex-col justify-between gap-6 lg:flex-row lg:items-end">
+<section class="section">
+  <div class="container">
+    <div class="section-head">
       <div>
-        <p class="text-xs font-semibold uppercase tracking-[0.2em] text-[#9CA3AF]">How it works</p>
-        <h2 class="mt-3 text-3xl font-semibold text-[#1A1A1A]">Paste. Shorten. Track. Repeat.</h2>
+        <p class="eyebrow">Why genieURL</p>
+        <h2 class="section-title">Designed for marketers, creators, and growth teams.</h2>
+        <p class="section-subtitle">Every touchpoint is optimized for speed, clarity, and conversion.</p>
       </div>
-      <a class="inline-flex items-center justify-center rounded-full border border-[#E2E4EA] bg-white px-5 py-2 text-xs font-semibold uppercase tracking-[0.2em] text-[#1A1A1A] transition hover:border-[#A259FF] hover:text-[#6E00FF]" href="{% url 'dashboard' %}">
-        Go to dashboard
-      </a>
+      <a class="btn btn-secondary" href="{% url 'pricing' %}">Compare plans</a>
     </div>
-    <div class="mt-8 grid gap-6 md:grid-cols-3">
-      <div class="rounded-3xl bg-white p-6 shadow-sm">
-        <h3 class="text-lg font-semibold text-[#1A1A1A]">1. Paste your link</h3>
-        <p class="mt-3 text-sm text-[#6B6B6B]">Drop any long URL and genieURL preps it with smart metadata and safety checks.</p>
-      </div>
-      <div class="rounded-3xl bg-white p-6 shadow-sm">
-        <h3 class="text-lg font-semibold text-[#1A1A1A]">2. Shorten & brand</h3>
-        <p class="mt-3 text-sm text-[#6B6B6B]">Pick a custom alias, add UTM tags, and keep everything aligned with your brand voice.</p>
-      </div>
-      <div class="rounded-3xl bg-white p-6 shadow-sm">
-        <h3 class="text-lg font-semibold text-[#1A1A1A]">3. Track results</h3>
-        <p class="mt-3 text-sm text-[#6B6B6B]">Analyze clicks, devices, and referrers with dashboards tuned for quick decisions.</p>
-      </div>
-    </div>
-  </div>
-</section>
-
-<section class="py-16">
-  <div class="container mx-auto px-4">
-    <div class="flex flex-col justify-between gap-6 lg:flex-row lg:items-end">
-      <div>
-        <p class="text-xs font-semibold uppercase tracking-[0.2em] text-[#9CA3AF]">Why genieURL</p>
-        <h2 class="mt-3 text-3xl font-semibold text-[#1A1A1A]">Designed for marketers, creators, and growth teams.</h2>
-        <p class="mt-2 max-w-2xl text-base text-[#6B6B6B]">Every touchpoint is optimized for speed, clarity, and conversion.</p>
-      </div>
-      <a class="inline-flex items-center justify-center rounded-full bg-[#1A1A1A] px-5 py-2 text-xs font-semibold uppercase tracking-[0.2em] text-white shadow-sm transition hover:-translate-y-0.5 hover:shadow-lg" href="{% url 'pricing' %}">
-        Compare plans
-      </a>
-    </div>
-    <div class="mt-8 grid gap-6 md:grid-cols-3">
+    <div class="feature-grid">
       {% for item in highlights %}
-      <div class="rounded-3xl border border-[#ECEFF4] bg-white p-6 shadow-sm">
-        <h3 class="text-lg font-semibold text-[#1A1A1A]">{{ item }}</h3>
-        <p class="mt-3 text-sm text-[#6B6B6B]">Built-in controls make it easy to keep links trusted, on-brand, and measurable.</p>
-      </div>
+        <div class="card-outline">
+          <h3>{{ item }}</h3>
+          <p class="text-muted">Built-in controls make it easy to keep links trusted, on-brand, and measurable.</p>
+        </div>
       {% endfor %}
     </div>
   </div>
 </section>
 
-<section class="bg-[#111827] py-16 text-white">
-  <div class="container mx-auto px-4">
-    <div class="flex flex-col justify-between gap-6 lg:flex-row lg:items-end">
+<section class="section section-muted">
+  <div class="container">
+    <div class="section-head">
       <div>
-        <p class="text-xs font-semibold uppercase tracking-[0.2em] text-[#A5B4FC]">Analytics that feel effortless</p>
-        <h2 class="mt-3 text-3xl font-semibold text-white">Premium insights without the clutter</h2>
-        <p class="mt-2 max-w-2xl text-sm text-[#CBD5F5]">
-          Spot trends instantly with clean visualizations, flexible filters, and export-ready reports.
-        </p>
+        <p class="eyebrow">Premium insights</p>
+        <h2 class="section-title">Analytics without the clutter.</h2>
+        <p class="section-subtitle">Spot trends instantly with clean visualizations, flexible filters, and export-ready reports.</p>
       </div>
-      <a class="inline-flex items-center justify-center rounded-full border border-[#4C1D95] bg-[#1E1B4B] px-5 py-2 text-xs font-semibold uppercase tracking-[0.2em] text-white transition hover:border-[#A259FF]" href="{% url 'pricing' %}">
-        Unlock premium
-      </a>
+      <a class="btn btn-outline-primary" href="{% url 'pricing' %}">Unlock premium</a>
     </div>
-    <div class="mt-8 grid gap-6 md:grid-cols-2">
-      <div class="rounded-3xl border border-[#312E81] bg-[#1F2937] p-6">
-        <h3 class="text-lg font-semibold">Campaign-ready dashboards</h3>
-        <p class="mt-3 text-sm text-[#CBD5F5]">See click spikes, geo hotspots, and device splits in one streamlined view.</p>
+    <div class="grid-two">
+      <div class="card-dark">
+        <h3>Campaign-ready dashboards</h3>
+        <p class="text-muted">See click spikes, geo hotspots, and device splits in one streamlined view.</p>
       </div>
-      <div class="rounded-3xl border border-[#312E81] bg-[#1F2937] p-6">
-        <h3 class="text-lg font-semibold">Privacy-first defaults</h3>
-        <p class="mt-3 text-sm text-[#CBD5F5]">Bot filtering, hashed IPs, and compliance-friendly export controls built in.</p>
+      <div class="card-dark">
+        <h3>Privacy-first defaults</h3>
+        <p class="text-muted">Bot filtering, hashed IPs, and compliance-friendly export controls built in.</p>
       </div>
     </div>
   </div>
 </section>
 
-<section class="py-16" id="contact">
-  <div class="container mx-auto px-4">
-    <!-- Contact block anchors the nav and provides next-step guidance. -->
-    <div class="flex flex-col gap-6 rounded-3xl border border-[#ECEFF4] bg-white p-8 shadow-sm lg:flex-row lg:items-center lg:justify-between">
+<section class="section" id="contact">
+  <div class="container">
+    <div class="card d-flex flex-column flex-lg-row align-items-lg-center justify-content-between gap-4">
       <div>
-        <h2 class="text-3xl font-semibold text-[#1A1A1A]">Ready to level up your link strategy?</h2>
-        <p class="mt-2 text-base text-[#6B6B6B]">Talk with our team about migrations, custom domains, or enterprise analytics.</p>
+        <h2 class="section-title">Ready to level up your link strategy?</h2>
+        <p class="section-subtitle">Talk with our team about migrations, custom domains, or enterprise analytics.</p>
       </div>
-      <div class="flex flex-wrap gap-3">
-        <a class="inline-flex items-center justify-center rounded-full bg-[#1A1A1A] px-6 py-3 text-xs font-semibold uppercase tracking-[0.2em] text-white shadow-sm transition hover:-translate-y-0.5 hover:shadow-lg" href="mailto:hello@genieurl.com">
-          Contact sales
-        </a>
-        <a class="inline-flex items-center justify-center rounded-full border border-[#E2E4EA] bg-white px-6 py-3 text-xs font-semibold uppercase tracking-[0.2em] text-[#1A1A1A] transition hover:border-[#A259FF] hover:text-[#6E00FF]" href="{% url 'register' %}">
-          Start free trial
-        </a>
+      <div class="d-flex flex-wrap gap-3">
+        <a class="btn btn-secondary" href="mailto:hello@genieurl.com">Contact sales</a>
+        <a class="btn btn-outline-secondary" href="{% url 'register' %}">Start free trial</a>
       </div>
     </div>
   </div>
 </section>
-{% endblock %}
-
-{% block extra_scripts %}
-<script>
-  const copyButtons = document.querySelectorAll('[data-copy]');
-  copyButtons.forEach((button) => {
-    button.addEventListener('click', () => {
-      const value = button.getAttribute('data-copy');
-      if (!value) {
-        return;
-      }
-      navigator.clipboard.writeText(value).then(() => {
-        button.textContent = 'Copied!';
-      });
-    });
-  });
-</script>
 {% endblock %}

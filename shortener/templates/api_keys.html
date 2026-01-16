@@ -5,21 +5,21 @@
 {% block content %}
 <section class="section">
   <div class="container">
-    <div class="section-header mb-4">
+    <div class="section-head">
       <div>
-        <h2 class="mb-1">Developer docs & API keys</h2>
-        <p class="text-muted">Integrate genieURL into your product with secure API access.</p>
+        <h2 class="section-title">Developer docs & API keys</h2>
+        <p class="section-subtitle">Integrate genieURL into your product with secure API access.</p>
       </div>
       <a class="btn btn-outline-primary" href="{% url 'pricing' %}">Upgrade to premium</a>
     </div>
     <div class="row g-4">
       <div class="col-lg-7">
-        <div class="surface-card">
+        <div class="card">
           <h4>API access</h4>
           {% if is_premium %}
             <p class="text-muted">Use this API key with the REST endpoints. Keep it secret.</p>
             {% if api_key %}
-              <div class="alert alert-secondary">{{ api_key }}</div>
+              <div class="card-muted">{{ api_key }}</div>
             {% else %}
               <p class="text-muted">No API key yet.</p>
             {% endif %}
@@ -33,7 +33,7 @@
         </div>
       </div>
       <div class="col-lg-5">
-        <div class="surface-card">
+        <div class="card">
           <h4>Quick start</h4>
           <p class="text-muted">Create a short link with curl:</p>
           <div class="card-outline">

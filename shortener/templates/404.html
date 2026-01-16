@@ -5,11 +5,11 @@
 {% block content %}
 <section class="section">
   <div class="container">
-    <div class="surface-card text-center">
+    <div class="card text-center">
       <h1>404</h1>
-      <p class="lead">We couldn't find that page.</p>
+      <p class="section-subtitle">We couldn't find that page.</p>
       <p class="text-muted">Try going back to the dashboard or shortening a new link.</p>
-      <div class="d-flex justify-content-center gap-2 mt-3">
+      <div class="d-flex justify-content-center gap-2 mt-3 flex-wrap">
         <a class="btn btn-primary" href="{% url 'home' %}#shorten">Shorten a link</a>
         <a class="btn btn-outline-secondary" href="{% url 'dashboard' %}">Go to dashboard</a>
       </div>

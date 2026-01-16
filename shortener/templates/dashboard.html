@@ -6,10 +6,10 @@
 {% block content %}
 <section class="section">
   <div class="container">
-    <div class="d-flex flex-column flex-lg-row justify-content-between align-items-lg-center mb-4 gap-3">
+    <div class="section-head">
       <div>
-        <h2 class="mb-1">Welcome back</h2>
-        <p class="text-muted mb-0">Plan: {{ plan }} · Track every click in one place.</p>
+        <h2 class="section-title">Welcome back</h2>
+        <p class="section-subtitle">Plan: {{ plan }} · Track every click in one place.</p>
       </div>
       <div class="d-flex flex-wrap gap-2">
         <a class="btn btn-outline-secondary" href="{% url 'api_keys' %}">API keys</a>
@@ -22,19 +22,18 @@
       <div class="ad-slot mb-4">Ad slot (Google AdSense / sponsor banner)</div>
     {% endif %}
 
-    <!-- KPI cards keep top metrics visible at a glance. -->
     <div class="kpi-grid mb-4">
-      <div class="stat-card">
+      <div class="stat">
         <p class="text-muted mb-1">Total URLs</p>
         <h3>{{ total_links }}</h3>
         <span class="text-muted small">All-time shortened links</span>
       </div>
-      <div class="stat-card">
+      <div class="stat">
         <p class="text-muted mb-1">Clicks this week</p>
         <h3>{{ clicks_week }}</h3>
         <span class="text-muted small">Last 7 days</span>
       </div>
-      <div class="stat-card">
+      <div class="stat">
         <p class="text-muted mb-1">Recent links</p>
         <h3>{{ recent_links|length }}</h3>
         <span class="text-muted small">Newest in your library</span>
@@ -43,7 +42,7 @@
 
     <div class="row g-4">
       <div class="col-lg-4">
-        <div class="surface-card">
+        <div class="card">
           <h4 class="mb-3">Create a new short link</h4>
           <form method="post" class="row g-3" novalidate>
             {% csrf_token %}
@@ -76,8 +75,7 @@
 
       <div class="col-lg-8">
         {% if is_premium %}
-          <!-- Premium analytics layout with richer charts and filters. -->
-          <div class="surface-card mb-4">
+          <div class="card mb-4">
             <div class="d-flex flex-column flex-md-row justify-content-between gap-3">
               <div>
                 <h4 class="mb-1">Performance overview</h4>
@@ -96,13 +94,13 @@
 
           <div class="row g-4 mb-4">
             <div class="col-md-6">
-              <div class="surface-card h-100">
+              <div class="card h-100">
                 <h5 class="mb-3">Clicks by device</h5>
                 <canvas id="deviceChart" height="180"></canvas>
               </div>
             </div>
             <div class="col-md-6">
-              <div class="surface-card h-100">
+              <div class="card h-100">
                 <h5 class="mb-3">Browser share</h5>
                 <canvas id="browserChart" height="180"></canvas>
               </div>
@@ -111,7 +109,7 @@
 
           <div class="row g-4">
             <div class="col-md-7">
-              <div class="surface-card h-100">
+              <div class="card h-100">
                 <h5 class="mb-3">Clicks by country</h5>
                 <img class="img-fluid rounded" src="{% static 'images/map-placeholder.svg' %}" alt="Map showing click distribution" />
                 <ul class="mt-3 mb-0">
@@ -127,7 +125,7 @@
               </div>
             </div>
             <div class="col-md-5">
-              <div class="surface-card h-100">
+              <div class="card h-100">
                 <h5 class="mb-3">Top referrers</h5>
                 <ul class="mb-0">
                   {% for link in recent_links %}
@@ -146,25 +144,24 @@
             </div>
           </div>
         {% else %}
-          <!-- Free dashboard keeps focus on link creation with light analytics and ads. -->
-          <div class="surface-card mb-4">
+          <div class="card mb-4">
             <h4 class="mb-2">Weekly clicks snapshot</h4>
             <p class="text-muted">Upgrade to premium for richer charts, export, and custom reports.</p>
             <canvas id="trendChart" height="120"></canvas>
           </div>
-          <div class="surface-card">
+          <div class="card">
             <h5 class="mb-3">Recent links</h5>
-            <ul class="list-group list-group-flush">
+            <ul class="mb-0">
               {% for link in recent_links %}
-                <li class="list-group-item d-flex justify-content-between align-items-center">
+                <li class="d-flex justify-content-between align-items-center mb-3">
                   <span>
                     <strong>{{ link.title|default:link.slug }}</strong>
                     <span class="text-muted small d-block">{{ link.destination_url|truncatechars:48 }}</span>
                   </span>
-                  <span class="badge bg-light text-dark">{{ link.clicks.count }} clicks</span>
+                  <span class="badge-soft">{{ link.clicks.count }} clicks</span>
                 </li>
               {% empty %}
-                <li class="list-group-item text-muted">No links yet. Create your first short URL.</li>
+                <li class="text-muted">No links yet. Create your first short URL.</li>
               {% endfor %}
             </ul>
             <div class="ad-slot mt-4">Ad slot (After link list)</div>
@@ -173,7 +170,7 @@
       </div>
     </div>
 
-    <div class="surface-card mt-4">
+    <div class="card mt-4">
       <div class="d-flex flex-column flex-md-row justify-content-between align-items-md-center gap-3 mb-3">
         <div>
           <h4 class="mb-1">Link management</h4>
@@ -246,8 +243,8 @@
           {
             label: 'Clicks',
             data: data,
-            borderColor: '#4f46e5',
-            backgroundColor: 'rgba(79,70,229,0.2)',
+            borderColor: '#6366f1',
+            backgroundColor: 'rgba(99,102,241,0.2)',
             tension: 0.35,
             fill: true,
           },
@@ -274,7 +271,7 @@
         datasets: [
           {
             data: deviceData.map((item) => item.count),
-            backgroundColor: ['#4f46e5', '#06b6d4', '#7c3aed', '#f97316'],
+            backgroundColor: ['#6366f1', '#0ea5e9', '#22c55e', '#f97316'],
           },
         ],
       },
