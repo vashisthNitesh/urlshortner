@@ -2,6 +2,7 @@
 {% load static %}
 
 {% block title %}genieURL | Home{% endblock %}
+{% block body_class %}landing-page{% endblock %}
 
 {% block content %}
 <section class="hero" id="shorten">
@@ -14,20 +15,20 @@
       </p>
       <div class="hero-actions">
         <a class="btn btn-primary" href="{% url 'register' %}">Start for free</a>
-        <a class="btn btn-outline-secondary" href="{% url 'pricing' %}">See pricing</a>
+        <a class="btn btn-secondary" href="{% url 'pricing' %}">See pricing</a>
       </div>
-      <div class="hero-metrics">
-        <div class="hero-metric">
+      <div class="metrics-strip" aria-label="Platform metrics">
+        <div class="metrics-item">
           <span class="metric-value">52K+</span>
-          <span class="metric-label">links created weekly</span>
+          <span class="metric-label">links created</span>
         </div>
-        <div class="hero-metric">
-          <span class="metric-value">4.9★</span>
-          <span class="metric-label">average customer rating</span>
+        <div class="metrics-item">
+          <span class="metric-value">4.9</span>
+          <span class="metric-label">customer rating</span>
         </div>
-        <div class="hero-metric">
+        <div class="metrics-item">
           <span class="metric-value">150+</span>
-          <span class="metric-label">countries reached</span>
+          <span class="metric-label">countries</span>
         </div>
       </div>
       <div class="hero-badges">
@@ -39,15 +40,16 @@
 
     <div class="hero-card">
       <div class="hero-card-head">
-        <h3 class="mb-2">Shorten a link instantly</h3>
-        <p class="text-muted">Create a branded short URL and keep every campaign in one place.</p>
+        <p class="eyebrow">Shorten in seconds</p>
+        <h3 class="mb-1">Shorten a link instantly</h3>
+        <p class="text-muted">Create a branded short URL and keep every campaign tidy.</p>
       </div>
-      <form method="post" class="d-grid gap-3" novalidate>
+      <form method="post" class="form-grid" novalidate>
         {% csrf_token %}
         {% if form.non_field_errors %}
           <div class="alert alert-danger">{{ form.non_field_errors }}</div>
         {% endif %}
-        <div>
+        <div class="form-field">
           <label class="form-label" for="id_destination_url">Long URL</label>
           <input
             class="input{% if form.destination_url.errors %} border-danger{% endif %}"
@@ -62,8 +64,8 @@
             <div class="inline-error">{{ form.destination_url.errors|striptags }}</div>
           {% endif %}
         </div>
-        <div class="grid-two">
-          <div>
+        <div class="grid-two form-row">
+          <div class="form-field">
             <label class="form-label" for="id_slug">Custom alias (optional)</label>
             <input
               class="input"
@@ -74,7 +76,7 @@
               value="{{ form.slug.value|default_if_none:'' }}"
             />
           </div>
-          <div>
+          <div class="form-field">
             <label class="form-label" for="id_email">Email for history</label>
             <input
               class="input"
@@ -87,7 +89,7 @@
             />
           </div>
         </div>
-        <div>
+        <div class="form-field">
           <label class="form-label" for="id_captcha">Quick verification</label>
           <input
             class="input{% if form.captcha.errors %} border-danger{% endif %}"
@@ -103,7 +105,15 @@
             <div class="inline-error">{{ form.captcha.errors|striptags }}</div>
           {% endif %}
         </div>
-        <button class="btn btn-primary" type="submit">Shorten URL</button>
+        <button class="btn btn-primary btn-block" type="submit">Shorten URL</button>
+        <div class="sample-output">
+          <div class="sample-pill" aria-label="Sample shortened link">
+            <span>genieurl.co/launch-day</span>
+            <button class="btn btn-secondary btn-icon" type="button" aria-label="Copy sample link">
+              <span class="btn-icon-mark">⧉</span>
+            </button>
+          </div>
+        </div>
       </form>
 
       {% if created_short_url %}
@@ -113,7 +123,7 @@
               <p class="fw-semibold mb-1">Short link ready</p>
               <p class="mb-0"><a href="{{ created_short_url }}">{{ created_short_url }}</a></p>
             </div>
-            <button class="btn btn-outline-primary btn-sm" type="button" data-copy="{{ created_short_url }}">Copy</button>
+            <button class="btn btn-secondary btn-sm" type="button" data-copy="{{ created_short_url }}">Copy</button>
           </div>
           <div class="d-flex flex-wrap gap-2 mt-3">
             <span class="badge-soft">🔒 Secure redirect</span>
@@ -142,6 +152,7 @@
       <div>
         <p class="eyebrow">How it works</p>
         <h2 class="section-title">Paste. Shorten. Track. Repeat.</h2>
+        <p class="section-subtitle">Launch a clean, branded link in under a minute, then monitor it in real time.</p>
       </div>
       <a class="btn btn-secondary" href="{% url 'dashboard' %}">Go to dashboard</a>
     </div>
@@ -170,7 +181,7 @@
         <h2 class="section-title">Designed for marketers, creators, and growth teams.</h2>
         <p class="section-subtitle">Every touchpoint is optimized for speed, clarity, and conversion.</p>
       </div>
-      <a class="btn btn-outline-secondary" href="{% url 'pricing' %}">Compare plans</a>
+      <a class="btn btn-secondary" href="{% url 'pricing' %}">Compare plans</a>
     </div>
     <div class="feature-grid">
       {% for item in highlights %}
@@ -191,14 +202,14 @@
         <h2 class="section-title">Analytics without the clutter.</h2>
         <p class="section-subtitle">Spot trends instantly with clean visualizations, flexible filters, and export-ready reports.</p>
       </div>
-      <a class="btn btn-outline-primary" href="{% url 'pricing' %}">Unlock premium</a>
+      <a class="btn btn-secondary" href="{% url 'pricing' %}">Unlock premium</a>
     </div>
     <div class="grid-two">
-      <div class="card-dark">
+      <div class="card">
         <h3>Campaign-ready dashboards</h3>
         <p class="text-muted">See click spikes, geo hotspots, and device splits in one streamlined view.</p>
       </div>
-      <div class="card-dark">
+      <div class="card">
         <h3>Privacy-first defaults</h3>
         <p class="text-muted">Bot filtering, hashed IPs, and compliance-friendly export controls built in.</p>
       </div>
@@ -208,14 +219,15 @@
 
 <section class="section" id="contact">
   <div class="container">
-    <div class="card-outline d-flex flex-column flex-lg-row align-items-lg-center justify-content-between gap-4">
+    <div class="card-outline cta-card d-flex flex-column flex-lg-row align-items-lg-center justify-content-between gap-4">
       <div>
+        <p class="eyebrow">Talk to us</p>
         <h2 class="section-title">Ready to level up your link strategy?</h2>
         <p class="section-subtitle">Talk with our team about migrations, custom domains, or enterprise analytics.</p>
       </div>
       <div class="d-flex flex-wrap gap-3">
         <a class="btn btn-secondary" href="mailto:hello@genieurl.com">Contact sales</a>
-        <a class="btn btn-outline-secondary" href="{% url 'register' %}">Start free trial</a>
+        <a class="btn btn-secondary" href="{% url 'register' %}">Start free trial</a>
       </div>
     </div>
   </div>
