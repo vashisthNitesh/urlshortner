@@ -35,14 +35,14 @@
           <a class="nav-link" href="{% url 'home' %}#contact">Contact</a>
         </nav>
         <div class="nav-actions">
-          <button class="btn btn-outline-secondary btn-sm" id="themeToggle" type="button" aria-label="Toggle dark mode">
-            🌙 Theme
+          <button class="btn btn-ghost btn-sm" id="themeToggle" type="button" aria-label="Toggle dark mode">
+            Theme
           </button>
           {% if user.is_authenticated %}
             <span class="text-muted small d-none d-md-inline">Hi {{ user.username }}</span>
-            <a class="btn btn-outline-primary btn-sm" href="{% url 'logout' %}">Logout</a>
+            <a class="btn btn-ghost btn-sm" href="{% url 'logout' %}">Logout</a>
           {% else %}
-            <a class="btn btn-outline-primary btn-sm" href="{% url 'login' %}">Login</a>
+            <a class="nav-link" href="{% url 'login' %}">Login</a>
             <a class="btn btn-primary btn-sm" href="{% url 'register' %}">Start free</a>
           {% endif %}
         </div>

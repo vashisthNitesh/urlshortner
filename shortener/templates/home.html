@@ -143,18 +143,18 @@
         <p class="eyebrow">How it works</p>
         <h2 class="section-title">Paste. Shorten. Track. Repeat.</h2>
       </div>
-      <a class="btn btn-outline-secondary" href="{% url 'dashboard' %}">Go to dashboard</a>
+      <a class="btn btn-secondary" href="{% url 'dashboard' %}">Go to dashboard</a>
     </div>
     <div class="feature-grid">
-      <div class="card">
+      <div class="card-outline">
         <h3>1. Paste your link</h3>
         <p class="text-muted">Drop any long URL and genieURL preps it with smart metadata and safety checks.</p>
       </div>
-      <div class="card">
+      <div class="card-outline">
         <h3>2. Shorten & brand</h3>
         <p class="text-muted">Pick a custom alias, add UTM tags, and keep everything aligned with your brand voice.</p>
       </div>
-      <div class="card">
+      <div class="card-outline">
         <h3>3. Track results</h3>
         <p class="text-muted">Analyze clicks, devices, and referrers with dashboards tuned for quick decisions.</p>
       </div>
@@ -170,11 +170,11 @@
         <h2 class="section-title">Designed for marketers, creators, and growth teams.</h2>
         <p class="section-subtitle">Every touchpoint is optimized for speed, clarity, and conversion.</p>
       </div>
-      <a class="btn btn-secondary" href="{% url 'pricing' %}">Compare plans</a>
+      <a class="btn btn-outline-secondary" href="{% url 'pricing' %}">Compare plans</a>
     </div>
     <div class="feature-grid">
       {% for item in highlights %}
-        <div class="card-outline">
+        <div class="card">
           <h3>{{ item }}</h3>
           <p class="text-muted">Built-in controls make it easy to keep links trusted, on-brand, and measurable.</p>
         </div>
@@ -208,7 +208,7 @@
 
 <section class="section" id="contact">
   <div class="container">
-    <div class="card d-flex flex-column flex-lg-row align-items-lg-center justify-content-between gap-4">
+    <div class="card-outline d-flex flex-column flex-lg-row align-items-lg-center justify-content-between gap-4">
       <div>
         <h2 class="section-title">Ready to level up your link strategy?</h2>
         <p class="section-subtitle">Talk with our team about migrations, custom domains, or enterprise analytics.</p>
