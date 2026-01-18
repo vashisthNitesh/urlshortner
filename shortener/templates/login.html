@@ -2,15 +2,23 @@
 
 {% block title %}Login | genieURL{% endblock %}
 
+{% block body_class %}login-page{% endblock %}
+
 {% block content %}
-<section class="section">
+<section class="section login-section">
   <div class="container">
     <div class="auth-shell">
-      <div>
+      <div class="auth-primary">
         <div class="card auth-card">
-          <h2 class="mb-2">Welcome back</h2>
-          <p class="text-muted">Log in to manage links, analytics, and campaigns.</p>
-          <form method="post" class="d-grid gap-3" novalidate>
+          <div class="auth-header">
+            <h2 class="mb-2">Welcome back</h2>
+            {% if request.GET.next %}
+              <p class="text-muted mb-0">Log in to continue to your dashboard.</p>
+            {% else %}
+              <p class="text-muted mb-0">Log in to manage links, analytics, and campaigns.</p>
+            {% endif %}
+          </div>
+          <form method="post" class="auth-form" novalidate>
             {% csrf_token %}
             {% if form.non_field_errors %}
               <div>
@@ -18,7 +26,7 @@
               </div>
             {% endif %}
             {% for field in form %}
-              <div>
+              <div class="auth-field">
                 <label class="form-label" for="{{ field.id_for_label }}">{{ field.label }}</label>
                 {{ field }}
                 {% if field.errors %}
@@ -26,28 +34,35 @@
                 {% endif %}
               </div>
             {% endfor %}
-            <div class="d-flex justify-content-between align-items-center">
+            <div class="auth-meta">
               <div class="form-check">
                 <input class="form-check-input" type="checkbox" id="rememberMe" />
                 <label class="form-check-label" for="rememberMe">Remember me</label>
               </div>
-              <a class="small" href="#">Forgot password?</a>
+              <a class="small text-muted" href="#">Forgot password?</a>
             </div>
             <div class="d-grid">
-              <button class="btn btn-primary" type="submit">Login</button>
+              <button class="btn btn-primary btn-lg w-100" type="submit">Login</button>
             </div>
+            <p class="text-muted small mb-0">
+              By continuing, you agree to <a href="{% url 'terms' %}">Terms</a> and
+              <a href="{% url 'privacy' %}">Privacy</a>.
+            </p>
           </form>
         </div>
       </div>
-      <div>
-        <div class="card-outline auth-aside">
+      <div class="auth-secondary">
+        <div class="card auth-aside">
           <h3>Why teams pick genieURL</h3>
-          <ul class="text-muted">
-            <li>Unified dashboards for rapid decisions.</li>
-            <li>Custom domains with automatic SSL.</li>
-            <li>Privacy-first analytics and UTM templates.</li>
+          <ul class="auth-benefits text-muted">
+            <li><span class="benefit-icon">🔗</span>Branded short links</li>
+            <li><span class="benefit-icon">🔒</span>Privacy-first analytics</li>
+            <li><span class="benefit-icon">🌐</span>Custom domains + SSL</li>
+            <li><span class="benefit-icon">📊</span>Export-ready reports</li>
           </ul>
-          <a class="btn btn-outline-primary" href="{% url 'register' %}">Create an account</a>
+          <div class="auth-help text-muted small">
+            Need help? <a href="{% url 'api_keys' %}">Docs</a> · <a href="{% url 'home' %}#contact">Contact</a>
+          </div>
         </div>
       </div>
     </div>
