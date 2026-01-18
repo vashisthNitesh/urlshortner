@@ -41,7 +41,7 @@
       <h2 class="h5 fw-semibold">Confirm and continue</h2>
       <div class="checkout-actions">
         <a class="btn btn-outline-secondary" href="{% url 'home' %}">Cancel</a>
-        <button class="btn btn-primary" type="button">Continue to secure payment</button>
+        <a class="btn btn-primary" href="{% url 'start_checkout' %}?plan=premium">Continue to secure payment</a>
       </div>
       <p class="text-muted small">You’ll be redirected to Razorpay to complete your payment securely.</p>
     </div>

@@ -18,6 +18,7 @@ urlpatterns = [
     path("dashboard/api-keys/", views.api_keys, name="api_keys"),
     path("dashboard/domains/", views.custom_domains, name="custom_domains"),
     path("dashboard/billing/", views.billing, name="billing"),
+    path("billing/checkout/", views.start_checkout, name="start_checkout"),
     path("api/v1/links/", views.api_create_link, name="api_create_link"),
     path("api/v1/links/<slug:slug>/", views.api_link_detail, name="api_link_detail"),
     path("webhooks/razorpay/", views.razorpay_webhook, name="razorpay_webhook"),
