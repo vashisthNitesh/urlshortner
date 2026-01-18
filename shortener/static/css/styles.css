@@ -904,6 +904,10 @@ h3 {
   margin: 0 auto;
 }
 
+.register-card {
+  max-width: 560px;
+}
+
 .auth-aside {
   display: grid;
   gap: var(--space-16);

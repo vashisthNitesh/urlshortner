@@ -3,52 +3,65 @@
 {% block title %}Register | genieURL{% endblock %}
 
 {% block content %}
-<section class="section">
+<section class="section login-section">
   <div class="container">
-    <div class="row align-items-center g-4">
-      <div class="col-lg-6">
-        <div class="card">
-          <h2 class="mb-2">Create your genieURL account</h2>
-          <p class="text-muted">Start for free, then upgrade when you need premium analytics.</p>
-          <form method="post" class="row g-3" novalidate>
+    <div class="auth-shell">
+      <div class="auth-primary">
+        <div class="card auth-card register-card">
+          <div class="auth-header">
+            <h2 class="mb-2">Create your genieURL account</h2>
+            <p class="text-muted mb-0">Start free. Upgrade anytime when you need premium analytics.</p>
+          </div>
+          <form method="post" class="auth-form" novalidate>
             {% csrf_token %}
             {% if form.non_field_errors %}
-              <div class="col-12">
+              <div>
                 <div class="alert alert-danger">{{ form.non_field_errors }}</div>
               </div>
             {% endif %}
             {% for field in form %}
-              <div class="col-12">
+              <div class="auth-field">
                 <label class="form-label" for="{{ field.id_for_label }}">{{ field.label }}</label>
                 {{ field }}
+                {% if field.name == "password1" %}
+                  <div class="form-text">Use 8+ characters.</div>
+                {% endif %}
                 {% if field.errors %}
                   <div class="inline-error">{{ field.errors|striptags }}</div>
                 {% endif %}
               </div>
             {% endfor %}
-            <div class="col-12">
-              <label class="form-label" for="planSelect">Choose your plan</label>
+            <div class="auth-field">
+              <label class="form-label text-muted" for="planSelect">Plan (you can change later)</label>
               <select class="form-select" id="planSelect">
                 <option>Free (Ad-supported)</option>
-                <option>Premium (Razorpay checkout)</option>
+                <option>Premium</option>
               </select>
             </div>
-            <div class="col-12 d-grid">
-              <button class="btn btn-primary" type="submit">Create account</button>
+            <div class="d-grid">
+              <button class="btn btn-primary btn-lg w-100" type="submit">Create account</button>
             </div>
-            <p class="text-muted small mb-0">By signing up, you agree to the Terms and Privacy Policy.</p>
+            <div class="text-center text-muted small">
+              Already have an account? <a href="{% url 'login' %}">Log in</a>
+            </div>
+            <p class="text-muted small mb-0">
+              By signing up, you agree to <a href="{% url 'terms' %}">Terms</a> and
+              <a href="{% url 'privacy' %}">Privacy</a>.
+            </p>
           </form>
         </div>
       </div>
-      <div class="col-lg-6">
-        <div class="card-muted">
+      <div class="auth-secondary">
+        <div class="card auth-aside">
           <h3>What you get</h3>
-          <ul class="text-muted">
-            <li>Unlimited shortening on free plan.</li>
-            <li>AdSense-ready placements for revenue.</li>
-            <li>Upgrade instantly with Razorpay.</li>
+          <ul class="auth-benefits text-muted">
+            <li><span class="benefit-icon">✨</span>Fast, branded short links for every channel.</li>
+            <li><span class="benefit-icon">📊</span>Real-time click insights to grow smarter.</li>
+            <li><span class="benefit-icon">🔒</span>Secure redirects with built-in protections.</li>
+            <li><span class="benefit-icon">📣</span>Share-ready links that look professional.</li>
+            <li><span class="benefit-icon">⚡</span>Instant setup with no code required.</li>
           </ul>
-          <a class="btn btn-outline-primary" href="{% url 'pricing' %}">Compare plans</a>
+          <div class="text-muted small">No credit card required. Upgrade anytime.</div>
         </div>
       </div>
     </div>
