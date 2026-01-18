@@ -9,13 +9,10 @@
     <div class="section-head">
       <div>
         <h2 class="section-title">Dashboard</h2>
-        <div class="d-flex align-items-center gap-2">
-          <span class="badge-soft">Plan: {{ plan }}</span>
-          <span class="text-muted small">Track, optimize, and scale every short link.</span>
-        </div>
+        <p class="text-muted mb-0">Plan: {{ plan }}</p>
       </div>
       <div class="d-flex flex-wrap gap-2">
-        <a class="btn btn-primary" href="#create-link">Create new link</a>
+        <a class="btn btn-primary" href="#create-link">Create link</a>
       </div>
     </div>
 
@@ -23,32 +20,48 @@
       <div class="card mb-4">
         <div class="d-flex justify-content-between align-items-center mb-2">
           <span class="badge-soft">Sponsored</span>
-          <span class="text-muted small">Ads help keep genieURL free.</span>
+          <span class="text-muted small">Suggested tools for your links.</span>
         </div>
-        <div class="rounded border" style="min-height: 110px; background: var(--surface2);"></div>
+        <div class="d-flex flex-column flex-md-row justify-content-between align-items-md-center gap-3">
+          <div>
+            <p class="fw-semibold mb-1">Simple link tips</p>
+            <p class="text-muted mb-0">Get a quick checklist for cleaner, safer links.</p>
+          </div>
+          <button class="btn btn-outline-primary btn-sm" type="button">Learn more</button>
+        </div>
       </div>
     {% endif %}
 
     <div class="kpi-grid mb-4">
       <div class="stat">
         <p class="text-muted mb-1">Total Links</p>
-        <h3>{{ total_links }}</h3>
-        <span class="text-muted small">All-time shortened links</span>
+        {% if total_links == 0 %}
+          <h3 class="mb-1">No links yet</h3>
+          <span class="text-muted small">Create your first link to get started.</span>
+        {% else %}
+          <h3>{{ total_links }}</h3>
+          <span class="text-muted small">All links you have made.</span>
+        {% endif %}
       </div>
       <div class="stat">
         <p class="text-muted mb-1">Clicks (last 7 days)</p>
-        <h3>{{ clicks_week }}</h3>
-        <span class="text-muted small">Recent engagement</span>
+        {% if clicks_week == 0 %}
+          <h3 class="mb-1">No clicks yet</h3>
+          <span class="text-muted small">Share a link to see activity.</span>
+        {% else %}
+          <h3>{{ clicks_week }}</h3>
+          <span class="text-muted small">Recent activity.</span>
+        {% endif %}
       </div>
       <div class="stat">
-        <p class="text-muted mb-1">Recent links</p>
-        <h3>{{ recent_links|length }}</h3>
-        <span class="text-muted small">New links added</span>
-      </div>
-      <div class="stat">
-        <p class="text-muted mb-1">Status summary</p>
-        <h3>{{ active_links }} active</h3>
-        <span class="text-muted small">{{ paused_links }} paused</span>
+        <p class="text-muted mb-1">Active links</p>
+        {% if active_links == 0 %}
+          <h3 class="mb-1">No active links</h3>
+          <span class="text-muted small">Turn on a link to start sharing.</span>
+        {% else %}
+          <h3>{{ active_links }}</h3>
+          <span class="text-muted small">{{ paused_links }} paused</span>
+        {% endif %}
       </div>
     </div>
 
@@ -56,8 +69,8 @@
       <div class="col-lg-5">
         <div class="card" id="create-link">
           <div class="d-flex flex-column gap-1 mb-3">
-            <h4 class="mb-0">Create link</h4>
-            <p class="text-muted mb-0">Shorten URLs in seconds with a focused, compact form.</p>
+            <h4 class="mb-0">Quick create</h4>
+            <p class="text-muted mb-0">Paste a long link and get a short one right away.</p>
           </div>
           <form method="post" class="row g-3" novalidate>
             {% csrf_token %}
@@ -67,14 +80,14 @@
               </div>
             {% endif %}
             <div class="col-12">
-              <label class="form-label" for="{{ form.destination_url.id_for_label }}">Destination URL</label>
+              <label class="form-label" for="{{ form.destination_url.id_for_label }}">Paste your long link</label>
               {{ form.destination_url }}
               {% if form.destination_url.errors %}
                 <div class="inline-error">{{ form.destination_url.errors|striptags }}</div>
               {% endif %}
             </div>
             <div class="col-12">
-              <label class="form-label" for="{{ form.slug.id_for_label }}">Custom slug (optional)</label>
+              <label class="form-label" for="{{ form.slug.id_for_label }}">Custom name (optional)</label>
               {{ form.slug }}
               {% if form.slug.errors %}
                 <div class="inline-error">{{ form.slug.errors|striptags }}</div>
@@ -93,7 +106,7 @@
                       aria-expanded="false"
                       aria-controls="advancedCollapse"
                     >
-                      Advanced options
+                      Optional settings
                     </button>
                   </h2>
                   <div
@@ -105,64 +118,67 @@
                     <div class="accordion-body">
                       {% if form.custom_domain %}
                         <div class="mb-3">
-                          <label class="form-label" for="{{ form.custom_domain.id_for_label }}">Custom domain</label>
+                          <label class="form-label" for="{{ form.custom_domain.id_for_label }}">Custom link domain (optional)</label>
                           {{ form.custom_domain }}
                         </div>
                       {% endif %}
                       {% if form.utm_template %}
                         <div class="mb-3">
-                          <label class="form-label" for="{{ form.utm_template.id_for_label }}">UTM template</label>
+                          <label class="form-label" for="{{ form.utm_template.id_for_label }}">Tracking fields (optional)</label>
                           {{ form.utm_template }}
                         </div>
                       {% endif %}
                       <div class="mb-3">
-                        <label class="form-label" for="{{ form.title.id_for_label }}">Title</label>
+                        <label class="form-label" for="{{ form.title.id_for_label }}">Link label (optional)</label>
                         {{ form.title }}
                       </div>
-                      <div class="row g-3 mb-3">
-                        <div class="col-md-6">
-                          <label class="form-label" for="{{ form.starts_at.id_for_label }}">Starts</label>
-                          {{ form.starts_at }}
-                        </div>
-                        <div class="col-md-6">
-                          <label class="form-label" for="{{ form.expires_at.id_for_label }}">Expires</label>
-                          {{ form.expires_at }}
-                          {% if form.expires_at.errors %}
-                            <div class="inline-error">{{ form.expires_at.errors|striptags }}</div>
-                          {% endif %}
+                      <div class="mb-3">
+                        <label class="form-label">Schedule link (optional)</label>
+                        <div class="row g-3">
+                          <div class="col-md-6">
+                            <label class="form-label small text-muted" for="{{ form.starts_at.id_for_label }}">Start time</label>
+                            {{ form.starts_at }}
+                          </div>
+                          <div class="col-md-6">
+                            <label class="form-label small text-muted" for="{{ form.expires_at.id_for_label }}">End time</label>
+                            {{ form.expires_at }}
+                            {% if form.expires_at.errors %}
+                              <div class="inline-error">{{ form.expires_at.errors|striptags }}</div>
+                            {% endif %}
+                          </div>
                         </div>
                       </div>
                       <div class="mb-3">
-                        <label class="form-label" for="{{ form.redirect_type.id_for_label }}">Redirect type</label>
+                        <label class="form-label" for="{{ form.redirect_type.id_for_label }}">Link behavior (optional)</label>
                         {{ form.redirect_type }}
                       </div>
                       <div class="mb-3">
-                        <label class="form-label">UTM builder</label>
+                        <label class="form-label">Tracking fields (optional)</label>
                         <div class="row g-3">
                           <div class="col-md-6">
                             {{ form.utm_source }}
-                            <div class="form-text">utm_source</div>
+                            <div class="form-text">Source</div>
                           </div>
                           <div class="col-md-6">
                             {{ form.utm_medium }}
-                            <div class="form-text">utm_medium</div>
+                            <div class="form-text">Type</div>
                           </div>
                           <div class="col-md-6">
                             {{ form.utm_campaign }}
-                            <div class="form-text">utm_campaign</div>
+                            <div class="form-text">Label</div>
                           </div>
                           <div class="col-md-6">
                             {{ form.utm_term }}
-                            <div class="form-text">utm_term</div>
+                            <div class="form-text">Keyword</div>
                           </div>
                           <div class="col-md-6">
                             {{ form.utm_content }}
-                            <div class="form-text">utm_content</div>
+                            <div class="form-text">Content note</div>
                           </div>
                         </div>
                       </div>
                       <div class="mb-0">
-                        <label class="form-label" for="{{ form.tags.id_for_label }}">Tags</label>
+                        <label class="form-label" for="{{ form.tags.id_for_label }}">Tags (optional)</label>
                         {{ form.tags }}
                         {% if form.tags.help_text %}
                           <div class="form-text">{{ form.tags.help_text }}</div>
@@ -184,7 +200,7 @@
               <div class="card-muted mt-4" aria-live="polite">
                 <div class="d-flex flex-column flex-sm-row justify-content-between align-items-sm-center gap-3">
                   <div>
-                    <p class="fw-semibold mb-1">Latest short link</p>
+                    <p class="fw-semibold mb-1">Your new short link</p>
                     <p class="mb-0">
                       <a href="{% url 'link_detail' latest_link.slug %}">
                         {{ request.scheme }}://{{ request.get_host }}/r/{{ latest_link.slug }}/
@@ -211,12 +227,12 @@
         <div class="card">
           <div class="d-flex flex-column flex-md-row justify-content-between gap-3">
             <div>
-              <h4 class="mb-1">Analytics snapshot</h4>
-              <p class="text-muted mb-0">A quick look at performance from the last 14 days.</p>
+              <h4 class="mb-1">Activity</h4>
+              <p class="text-muted mb-0">A quick look at clicks from the last 14 days.</p>
             </div>
             {% if not is_premium %}
               <div class="notice warning mb-0">
-                Upgrade to Premium for exports, advanced charts, and QR analytics.
+                Upgrade to Premium for exports, advanced charts, and QR insights.
               </div>
             {% endif %}
           </div>
@@ -225,10 +241,9 @@
               <canvas id="trendChart" height="140"></canvas>
             </div>
           {% else %}
-            <div class="text-center py-5">
-              <h5>No clicks yet</h5>
-              <p class="text-muted">Share your newest short link to start collecting analytics.</p>
-              <a class="btn btn-outline-primary" href="#create-link">Create a link</a>
+            <div class="card-muted mt-3">
+              <h5 class="mb-1">No activity yet</h5>
+              <p class="text-muted mb-0">Share a link to start seeing clicks here.</p>
             </div>
           {% endif %}
         </div>
@@ -238,15 +253,16 @@
     <div class="card mt-4">
       <div class="d-flex flex-column flex-md-row justify-content-between align-items-md-center gap-3 mb-3">
         <div>
-          <h4 class="mb-1">Link management</h4>
-          <p class="text-muted mb-0">Search, filter, and manage all of your short links.</p>
+          <h4 class="mb-1">Your links</h4>
+          <p class="text-muted mb-0">Search, filter, and manage your links in one place.</p>
         </div>
         <form method="get" class="d-flex flex-wrap gap-2">
           <input class="form-control form-control-sm" type="search" name="q" placeholder="Search links" />
           <select class="form-select form-select-sm" name="status" aria-label="Filter by status">
-            <option value="">All statuses</option>
+            <option value="">All</option>
             <option value="active">Active</option>
             <option value="paused">Paused</option>
+            <option value="expired">Expired</option>
           </select>
           <button class="btn btn-outline-secondary btn-sm" type="submit">Filter</button>
         </form>
@@ -290,7 +306,11 @@
                     <a class="btn btn-sm btn-outline-primary" href="{% url 'link_edit' link.slug %}">Edit</a>
                     <form method="post" action="{% url 'link_delete' link.slug %}" class="d-inline">
                       {% csrf_token %}
-                      <button class="btn btn-sm btn-outline-secondary" type="submit">Disable</button>
+                      {% if link.is_available %}
+                        <button class="btn btn-sm btn-outline-secondary" type="submit">Pause</button>
+                      {% else %}
+                        <button class="btn btn-sm btn-outline-secondary" type="submit">Resume</button>
+                      {% endif %}
                     </form>
                     <form method="post" action="{% url 'link_delete' link.slug %}" class="d-inline">
                       {% csrf_token %}
@@ -306,16 +326,22 @@
           <div class="card mt-3">
             <div class="d-flex justify-content-between align-items-center mb-2">
               <span class="badge-soft">Sponsored</span>
-              <span class="text-muted small">More tools for growth</span>
+              <span class="text-muted small">Recommended for you</span>
             </div>
-            <div class="rounded border" style="min-height: 120px; background: var(--surface2);"></div>
+            <div class="d-flex flex-column flex-md-row justify-content-between align-items-md-center gap-3">
+              <div>
+                <p class="fw-semibold mb-1">Speed up link checks</p>
+                <p class="text-muted mb-0">See a weekly summary of your top links.</p>
+              </div>
+              <button class="btn btn-outline-primary btn-sm" type="button">View summary</button>
+            </div>
           </div>
         {% endif %}
       {% else %}
         <div class="text-center py-5">
           <h5>No links yet</h5>
-          <p class="text-muted">Create your first short link and start tracking clicks instantly.</p>
-          <a class="btn btn-primary" href="#create-link">Create a link</a>
+          <p class="text-muted">Create your first link to start sharing.</p>
+          <a class="btn btn-primary" href="#create-link">Create link</a>
         </div>
       {% endif %}
     </div>
