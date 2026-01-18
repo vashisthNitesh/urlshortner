@@ -6,17 +6,17 @@
 {% block content %}
 <section class="hero" id="shorten">
   <div class="container hero-grid">
-    <div>
+    <div class="hero-copy">
       <p class="eyebrow">Next-gen short links</p>
       <h1 class="section-title">Magnetic short links for teams that move fast.</h1>
       <p class="section-subtitle">
         Build branded, trackable links with instant redirects, smart QR codes, and privacy-first analytics across every channel.
       </p>
-      <div class="d-flex flex-wrap gap-3 mt-4">
+      <div class="hero-actions">
         <a class="btn btn-primary" href="{% url 'register' %}">Start for free</a>
         <a class="btn btn-outline-secondary" href="{% url 'pricing' %}">See pricing</a>
       </div>
-      <div class="hero-metrics mt-4">
+      <div class="hero-metrics">
         <div class="hero-metric">
           <span class="metric-value">52K+</span>
           <span class="metric-label">links created weekly</span>
@@ -30,7 +30,7 @@
           <span class="metric-label">countries reached</span>
         </div>
       </div>
-      <div class="d-flex flex-wrap gap-2 mt-4">
+      <div class="hero-badges">
         <span class="badge-soft">99.9% uptime SLA</span>
         <span class="badge-soft">GDPR ready</span>
         <span class="badge-soft">QR codes included</span>
@@ -38,7 +38,7 @@
     </div>
 
     <div class="hero-card">
-      <div class="mb-4">
+      <div class="hero-card-head">
         <h3 class="mb-2">Shorten a link instantly</h3>
         <p class="text-muted">Create a branded short URL and keep every campaign in one place.</p>
       </div>
