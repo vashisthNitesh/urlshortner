@@ -15,6 +15,7 @@ from django.db.models import Count
 from django.http import HttpRequest, HttpResponse, HttpResponseRedirect, JsonResponse
 from django.shortcuts import get_object_or_404, redirect, render
 from django.urls import reverse
+from django.utils.http import url_has_allowed_host_and_scheme
 from django.utils import timezone
 from django.views.decorators.csrf import csrf_exempt
 from django.views.decorators.http import require_http_methods
@@ -97,11 +98,20 @@ def pricing(request: HttpRequest) -> HttpResponse:
 
 
 def login_view(request: HttpRequest) -> HttpResponse:
+    if request.user.is_authenticated:
+        return redirect("dashboard")
     form = LoginForm(request, data=request.POST or None)
+    next_url = request.POST.get("next") or request.GET.get("next")
+    if next_url and not url_has_allowed_host_and_scheme(
+        next_url,
+        allowed_hosts={request.get_host()},
+        require_https=request.is_secure(),
+    ):
+        next_url = None
     if request.method == "POST" and form.is_valid():
         login(request, form.get_user())
-        return redirect("dashboard")
-    return render(request, "login.html", {"form": form})
+        return redirect(next_url or "dashboard")
+    return render(request, "login.html", {"form": form, "next": next_url})
 
 
 def register(request: HttpRequest) -> HttpResponse:
@@ -301,6 +311,20 @@ def custom_domains(request: HttpRequest) -> HttpResponse:
 def billing(request: HttpRequest) -> HttpResponse:
     profile = request.user.profile
     return render(request, "billing.html", {"profile": profile, "is_premium": profile.is_premium()})
+
+
+@login_required
+@require_http_methods(["GET"])
+def start_checkout(request: HttpRequest) -> HttpResponseRedirect:
+    checkout_url = os.environ.get("RAZORPAY_CHECKOUT_URL", "").strip()
+    plan = request.GET.get("plan", "").strip()
+    if not checkout_url:
+        messages.error(request, "Payment checkout is not configured yet. Please contact support.")
+        return redirect("billing")
+    if plan:
+        separator = "&" if "?" in checkout_url else "?"
+        checkout_url = f"{checkout_url}{separator}plan={plan}"
+    return redirect(checkout_url)
 
 
 def redirect_link(request: HttpRequest, slug: str) -> HttpResponseRedirect:
