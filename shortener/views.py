@@ -72,14 +72,14 @@ def home(request: HttpRequest) -> HttpResponse:
 def pricing(request: HttpRequest) -> HttpResponse:
     tiers = [
         {
-            "name": "Normal",
+            "name": "Free (Normal)",
             "price": "$0",
             "features": [
                 "Basic redirects and branded short links",
-                "Ad-supported experience with Google AdSense slots",
+                "Ad-supported experience for visitors",
                 "Standard analytics and link history",
             ],
-            "cta": "Create a free account",
+            "cta": "Start free",
         },
         {
             "name": "Premium",
@@ -88,9 +88,9 @@ def pricing(request: HttpRequest) -> HttpResponse:
                 "No ads for you or your visitors",
                 "Custom domains, password-protected links, and QR codes",
                 "Advanced analytics exports and priority support",
-                "Upgrade via Razorpay checkout",
+                "Advanced link controls and privacy settings",
             ],
-            "cta": "Upgrade with Razorpay",
+            "cta": "Upgrade to Premium",
         },
     ]
     return render(request, "pricing.html", {"tiers": tiers})

@@ -497,6 +497,91 @@ h3 {
   box-shadow: var(--shadow-sm);
 }
 
+.pricing-stack > * + * {
+  margin-top: var(--space-64);
+}
+
+.pricing-grid.pricing-grid-plans > * {
+  grid-column: span 6;
+}
+
+.pricing-card {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-16);
+  border-radius: 12px;
+  box-shadow: var(--shadow-sm);
+}
+
+.pricing-card ul {
+  padding-left: 18px;
+  margin: 0;
+  display: grid;
+  gap: 8px;
+}
+
+.pricing-card--premium {
+  border-color: rgba(79, 70, 229, 0.25);
+  background: #f8f9ff;
+  box-shadow: var(--shadow-md);
+}
+
+.plan-badge {
+  position: absolute;
+  top: 16px;
+  right: 16px;
+  padding: 4px 10px;
+  border-radius: 999px;
+  font-size: 0.72rem;
+  font-weight: 600;
+  color: #1e293b;
+  background: rgba(79, 70, 229, 0.12);
+}
+
+.pricing-reassurance {
+  margin-top: 12px;
+  color: var(--muted);
+  font-size: 0.9rem;
+}
+
+.pricing-unlock .section-title {
+  max-width: 520px;
+}
+
+.checklist {
+  list-style: none;
+  padding: 0;
+  margin: var(--space-24) 0 0;
+  display: grid;
+  gap: 12px;
+}
+
+.checklist li {
+  display: flex;
+  align-items: flex-start;
+  gap: 10px;
+  color: var(--text);
+}
+
+.checklist li::before {
+  content: "✓";
+  color: var(--primary);
+  font-weight: 600;
+}
+
+.pricing-payment {
+  display: grid;
+  gap: var(--space-12);
+}
+
+.pricing-payment-list {
+  display: grid;
+  gap: 8px;
+  color: var(--muted);
+  font-size: 0.92rem;
+}
+
 .card-outline {
   border-radius: var(--r-md);
   border: 1px solid var(--border);
