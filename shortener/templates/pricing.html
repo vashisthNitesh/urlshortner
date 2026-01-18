@@ -38,44 +38,13 @@
     </div>
 
     <div class="checkout-cta">
+      <h2 class="h5 fw-semibold">Confirm and continue</h2>
       <div class="checkout-actions">
         <a class="btn btn-outline-secondary" href="{% url 'home' %}">Cancel</a>
-        <button class="btn btn-primary" type="button" data-bs-toggle="modal" data-bs-target="#checkoutModal">
-          Continue to secure payment
-        </button>
+        <button class="btn btn-primary" type="button">Continue to secure payment</button>
       </div>
       <p class="text-muted small">You’ll be redirected to Razorpay to complete your payment securely.</p>
     </div>
   </div>
 </section>
-
-<div class="modal fade" id="checkoutModal" tabindex="-1" aria-labelledby="checkoutModalLabel" aria-hidden="true">
-  <div class="modal-dialog modal-dialog-centered">
-    <div class="modal-content">
-      <div class="modal-header">
-        <h5 class="modal-title" id="checkoutModalLabel">Confirm and continue</h5>
-        <button class="btn-close" type="button" data-bs-dismiss="modal" aria-label="Close"></button>
-      </div>
-      <div class="modal-body">
-        <p class="text-muted">
-          You’ll be redirected to Razorpay to complete payment. Once confirmed, your Premium access unlocks immediately.
-        </p>
-        <div class="card-outline d-grid gap-2">
-          <div class="d-flex justify-content-between align-items-center">
-            <span class="text-muted small">Plan</span>
-            <span class="fw-semibold">Premium</span>
-          </div>
-          <div class="d-flex justify-content-between align-items-center">
-            <span class="text-muted small">Billing</span>
-            <span class="fw-semibold">Monthly, cancel anytime</span>
-          </div>
-        </div>
-      </div>
-      <div class="modal-footer">
-        <button class="btn btn-outline-secondary" type="button" data-bs-dismiss="modal">Cancel</button>
-        <button class="btn btn-primary" type="button">Continue to secure payment</button>
-      </div>
-    </div>
-  </div>
-</div>
 {% endblock %}
