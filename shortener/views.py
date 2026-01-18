@@ -155,6 +155,8 @@ def dashboard(request: HttpRequest) -> HttpResponse:
 
     recent_links = link_qs.order_by("-created_at")[:5]
     total_links = link_qs.count()
+    active_links = link_qs.filter(is_active=True).count()
+    paused_links = link_qs.filter(is_active=False).count()
     clicks_week = ClickEvent.objects.filter(
         link__user=request.user,
         created_at__gte=timezone.now() - timedelta(days=7),
@@ -194,6 +196,8 @@ def dashboard(request: HttpRequest) -> HttpResponse:
         "links": links,
         "recent_links": recent_links,
         "total_links": total_links,
+        "active_links": active_links,
+        "paused_links": paused_links,
         "clicks_week": clicks_week,
         "clicks_by_day": json.dumps(clicks_by_day),
         "device_counts": json.dumps(device_counts),
