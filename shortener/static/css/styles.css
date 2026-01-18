@@ -735,19 +735,108 @@ h3 {
   display: grid;
   grid-template-columns: repeat(12, minmax(0, 1fr));
   gap: var(--space-32);
+  align-items: center;
 }
 
 .auth-shell > * {
   grid-column: span 6;
 }
 
+.login-page {
+  background: var(--bg);
+}
+
+.login-section {
+  position: relative;
+  overflow: hidden;
+}
+
+.login-section::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: radial-gradient(circle at top left, rgba(79, 70, 229, 0.08), transparent 55%);
+  pointer-events: none;
+}
+
+.login-section .container {
+  position: relative;
+  z-index: 1;
+}
+
+.auth-primary {
+  grid-column: span 5;
+}
+
+.auth-secondary {
+  grid-column: span 7;
+}
+
 .auth-card {
   padding: 28px;
+  max-width: 460px;
+  width: 100%;
+  margin: 0 auto;
 }
 
 .auth-aside {
   display: grid;
   gap: var(--space-16);
+}
+
+.auth-header {
+  margin-bottom: var(--space-24);
+}
+
+.auth-form {
+  display: grid;
+  gap: var(--space-16);
+}
+
+.auth-field {
+  display: grid;
+  gap: 6px;
+}
+
+.auth-meta {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-16);
+  font-size: var(--font-small);
+}
+
+.auth-benefits {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  display: grid;
+  gap: var(--space-12);
+}
+
+.auth-benefits li {
+  display: flex;
+  align-items: flex-start;
+  gap: 10px;
+}
+
+.benefit-icon {
+  display: inline-flex;
+  width: 22px;
+  height: 22px;
+  align-items: center;
+  justify-content: center;
+  border-radius: 8px;
+  background: rgba(79, 70, 229, 0.12);
+  color: var(--primary);
+  font-size: 0.75rem;
+  flex-shrink: 0;
+  margin-top: 2px;
+}
+
+.auth-help a {
+  color: inherit;
+  font-weight: 500;
 }
 
 .billing-grid {
