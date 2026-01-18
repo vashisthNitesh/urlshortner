@@ -9,38 +9,60 @@
       <div>
         <p class="eyebrow">Pricing</p>
         <h1 class="section-title">Plans that flex with your growth.</h1>
-        <p class="section-subtitle">Start free, then scale with premium analytics, custom domains, and advanced controls.</p>
-      </div>
-      <div class="d-flex gap-2">
-        <button class="btn btn-ghost" type="button">Monthly</button>
-        <button class="btn btn-ghost" type="button">Yearly</button>
+        <p class="section-subtitle">Start free, then scale with premium analytics, custom domains, and deeper controls.</p>
+        <p class="pricing-reassurance">No credit card required for free · Cancel anytime</p>
       </div>
     </div>
 
-    <div class="pricing-grid">
-      {% for tier in tiers %}
-        <div class="card">
-          <h3>{{ tier.name }}</h3>
-          <p class="h2 fw-bold mb-2">{{ tier.price }}<span class="text-muted small">/month</span></p>
-          <ul class="text-muted">
-            {% for feature in tier.features %}
-              <li>{{ feature }}</li>
-            {% endfor %}
-          </ul>
-          {% if tier.name == "Premium" %}
-            <button class="btn btn-primary" type="button" data-bs-toggle="modal" data-bs-target="#checkoutModal">
-              Upgrade with Razorpay
-            </button>
-          {% else %}
-            <a class="btn btn-outline-primary" href="{% url 'register' %}">{{ tier.cta }}</a>
-          {% endif %}
+    <div class="pricing-stack">
+      <div class="pricing-grid pricing-grid-plans">
+        {% for tier in tiers %}
+          <div class="card pricing-card {% if tier.name == 'Premium' %}pricing-card--premium{% endif %}">
+            {% if tier.name == "Premium" %}
+              <span class="plan-badge">Most popular</span>
+            {% endif %}
+            <h3>{{ tier.name }}</h3>
+            <p class="h2 fw-bold mb-2">{{ tier.price }}<span class="text-muted small">/month</span></p>
+            <ul class="text-muted">
+              {% for feature in tier.features %}
+                <li>{{ feature }}</li>
+              {% endfor %}
+            </ul>
+            {% if tier.name == "Premium" %}
+              <button class="btn btn-primary" type="button" data-bs-toggle="modal" data-bs-target="#checkoutModal">
+                {{ tier.cta }}
+              </button>
+            {% else %}
+              <a class="btn btn-outline-primary btn-secondary-cta" href="{% url 'register' %}">{{ tier.cta }}</a>
+            {% endif %}
+          </div>
+        {% endfor %}
+      </div>
+
+      <div class="card-outline pricing-unlock">
+        <div class="section-head">
+          <div>
+            <p class="eyebrow">What you unlock with Premium</p>
+            <h2 class="section-title">Upgrade for more reach, control, and insight.</h2>
+          </div>
         </div>
-      {% endfor %}
-    </div>
+        <ul class="checklist">
+          <li>Ad-free experience for you and your visitors</li>
+          <li>Custom domains, branded links, and QR codes</li>
+          <li>Export-ready analytics with deeper trend insights</li>
+          <li>Advanced privacy controls and password-protected links</li>
+          <li>Priority support and onboarding guidance</li>
+        </ul>
+      </div>
 
-    <div class="card-outline mt-4">
-      <strong>Razorpay checkout:</strong> Premium upgrades are processed via Razorpay. Use the checkout modal below to integrate
-      your Razorpay order ID and key.
+      <div class="card-outline pricing-payment">
+        <p class="eyebrow">Payment reassurance</p>
+        <div class="pricing-payment-list">
+          <span>Secure payments powered by Razorpay</span>
+          <span>UPI, cards, and netbanking supported</span>
+          <span>Cancel anytime · No hidden fees</span>
+        </div>
+      </div>
     </div>
   </div>
 </section>
@@ -53,26 +75,23 @@
         <button class="btn-close" type="button" data-bs-dismiss="modal" aria-label="Close"></button>
       </div>
       <div class="modal-body">
-        <p class="text-muted">Replace the placeholders with your Razorpay order ID and checkout script.</p>
+        <p class="text-muted">
+          You’ll be redirected to our secure payment partner to complete your upgrade. Your subscription is ready in minutes.
+        </p>
         <div class="card-outline d-grid gap-2">
           <div class="d-flex justify-content-between align-items-center">
             <span class="text-muted small">Plan</span>
             <span class="fw-semibold">Premium</span>
           </div>
           <div class="d-flex justify-content-between align-items-center">
-            <span class="text-muted small">Order ID</span>
-            <code>razorpay_order_XXXX</code>
-          </div>
-          <div class="d-flex justify-content-between align-items-center">
-            <span class="text-muted small">Amount</span>
-            <span class="fw-semibold">₹999 / month</span>
+            <span class="text-muted small">Billing</span>
+            <span class="fw-semibold">Monthly, cancel anytime</span>
           </div>
         </div>
-        <div class="ad-slot mt-3">Checkout preview / Razorpay button</div>
       </div>
       <div class="modal-footer">
         <button class="btn btn-outline-secondary" type="button" data-bs-dismiss="modal">Cancel</button>
-        <button class="btn btn-primary" type="button">Proceed to Razorpay</button>
+        <button class="btn btn-primary" type="button">Continue to payment</button>
       </div>
     </div>
   </div>
