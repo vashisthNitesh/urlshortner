@@ -10,21 +10,20 @@
 {% block content %}
 <section class="section dashboard">
   <div class="container">
-    <div class="dashboard-header">
-      <div>
+    <div class="dashboard-header dashboard-section">
+      <div class="dashboard-header-left">
         <div class="d-flex flex-wrap align-items-center gap-2 mb-2">
           <h1 class="dashboard-title mb-0">Dashboard</h1>
           <span class="badge-soft badge-plan">{{ plan|default:"Free" }}</span>
-          <a class="text-muted small dashboard-plan-link" href="{% url 'billing' %}">See Premium features</a>
         </div>
         <p class="text-muted mb-0">Shorten links and track clicks.</p>
       </div>
-      <div class="d-flex flex-wrap gap-2">
+      <div class="dashboard-header-right">
         <a class="btn btn-primary" href="#create-link">Create link</a>
       </div>
     </div>
 
-    <div class="kpi-grid dashboard-metrics mb-4">
+    <div class="dashboard-metrics dashboard-section">
       <div class="stat dashboard-stat-card">
         <p class="text-muted small mb-1">Total links</p>
         <h3 class="mb-1">{{ total_links|default:"0" }}</h3>
@@ -42,8 +41,8 @@
       </div>
     </div>
 
-    <div class="dashboard-main mb-5">
-      <div class="card dashboard-card" id="create-link">
+    <div class="dashboard-main dashboard-section">
+      <div class="card dashboard-card dashboard-primary" id="create-link">
         <div class="dashboard-card-head">
           <h4 class="mb-1">Create link</h4>
           <p class="text-muted mb-0">Keep it simple and easy to share.</p>
@@ -164,7 +163,7 @@
       <div class="dashboard-side">
         <div class="card dashboard-card">
           <div class="dashboard-card-head">
-            <h4 class="mb-1">Activity</h4>
+            <h4 class="mb-1">Analytics</h4>
             <p class="text-muted mb-0">Clicks from the last 14 days.</p>
           </div>
           {% if clicks_week > 0 %}
@@ -172,27 +171,23 @@
               <canvas id="trendChart" height="160"></canvas>
             </div>
           {% else %}
-            <div class="dashboard-empty">
-              <p class="text-muted mb-0">No activity yet. Share a link to see clicks here.</p>
+            <div class="dashboard-empty dashboard-empty-analytics">
+              <div class="dashboard-empty-icon" aria-hidden="true">
+                <svg viewBox="0 0 24 24" role="presentation">
+                  <path d="M4 18V6a2 2 0 0 1 2-2h12" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/>
+                  <path d="M4 18h12a2 2 0 0 0 2-2V8" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/>
+                  <path d="M8 14l2-3 3 2 4-5" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+                </svg>
+              </div>
+              <p class="text-muted mb-2">Share a link to see activity here.</p>
+              <a class="btn btn-outline-secondary btn-sm" href="#create-link">Create link</a>
             </div>
           {% endif %}
         </div>
       </div>
     </div>
 
-    {% if ad_enabled and not is_premium %}
-      <div class="card dashboard-card dashboard-sponsored mb-5">
-        <div class="d-flex justify-content-between align-items-center mb-2">
-          <span class="badge-soft">Sponsored</span>
-          <span class="text-muted small">Keeping genieURL free</span>
-        </div>
-        <div class="ad-slot">
-          <span class="text-muted small">Ad space</span>
-        </div>
-      </div>
-    {% endif %}
-
-    <div class="card dashboard-links">
+    <div class="card dashboard-links dashboard-section">
       <div class="dashboard-links-head">
         <div>
           <h4 class="mb-1">Your links</h4>
@@ -276,6 +271,18 @@
         </div>
       {% endif %}
     </div>
+
+    {% if ad_enabled and not is_premium %}
+      <div class="card dashboard-card dashboard-sponsored">
+        <div class="d-flex justify-content-between align-items-center mb-2">
+          <span class="badge-soft">Sponsored</span>
+          <span class="text-muted small">Keeping genieURL free</span>
+        </div>
+        <div class="ad-slot">
+          <span class="text-muted small">Ad space</span>
+        </div>
+      </div>
+    {% endif %}
   </div>
 </section>
 {% endblock %}
