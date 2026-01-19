@@ -7,9 +7,11 @@
 }
 
 .dashboard .container {
-  max-width: 1200px;
-  padding-left: 32px;
-  padding-right: 32px;
+  width: 100%;
+  max-width: none;
+  margin: 0;
+  padding-left: 24px;
+  padding-right: 24px;
 }
 
 .dashboard-header {
@@ -241,6 +243,14 @@
   position: relative;
 }
 
+.dashboard-table-scroll {
+  overflow-x: auto;
+}
+
+.dashboard-table {
+  min-width: 900px;
+}
+
 .dashboard-table th {
   font-size: 0.75rem;
   text-transform: uppercase;
@@ -468,6 +478,11 @@
 }
 
 @media (max-width: 768px) {
+  .dashboard .container {
+    padding-left: 16px;
+    padding-right: 16px;
+  }
+
   .dashboard-metrics > * {
     grid-column: span 12;
   }
