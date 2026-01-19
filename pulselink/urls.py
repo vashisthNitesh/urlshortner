@@ -15,6 +15,7 @@ urlpatterns = [
     path("dashboard/link/<slug:slug>/", views.link_detail, name="link_detail"),
     path("dashboard/link/<slug:slug>/edit/", views.link_edit, name="link_edit"),
     path("dashboard/link/<slug:slug>/delete/", views.link_delete, name="link_delete"),
+    path("dashboard/links/data/", views.dashboard_links_data, name="dashboard_links_data"),
     path("dashboard/api-keys/", views.api_keys, name="api_keys"),
     path("dashboard/domains/", views.custom_domains, name="custom_domains"),
     path("dashboard/billing/", views.billing, name="billing"),

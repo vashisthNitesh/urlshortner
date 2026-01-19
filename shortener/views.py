@@ -9,6 +9,7 @@ from django.contrib import messages
 from django.contrib.auth import authenticate, login, logout
 from django.contrib.auth.decorators import login_required
 from django.core.cache import cache
+from django.core.paginator import Paginator
 from django.db import models
 from django.db.models import Q
 from django.db.models import Count
@@ -148,11 +149,6 @@ def dashboard(request: HttpRequest) -> HttpResponse:
             messages.success(request, "Short link created.")
             return redirect("dashboard")
     link_qs = Link.objects.filter(user=request.user)
-    links = link_qs.order_by("-created_at")
-    query = request.GET.get("q")
-    if query:
-        links = links.filter(Q(title__icontains=query) | Q(slug__icontains=query))
-
     recent_links = link_qs.order_by("-created_at")[:5]
     total_links = link_qs.count()
     active_links = link_qs.filter(is_active=True).count()
@@ -193,7 +189,6 @@ def dashboard(request: HttpRequest) -> HttpResponse:
 
     context = {
         "form": form,
-        "links": links,
         "recent_links": recent_links,
         "total_links": total_links,
         "active_links": active_links,
@@ -208,6 +203,91 @@ def dashboard(request: HttpRequest) -> HttpResponse:
         "ad_enabled": not is_premium,
     }
     return render(request, "dashboard.html", context)
+
+
+@login_required
+@require_http_methods(["GET"])
+def dashboard_links_data(request: HttpRequest) -> JsonResponse:
+    link_qs = Link.objects.filter(user=request.user).annotate(clicks_count=Count("clicks"))
+    query = request.GET.get("q", "").strip()
+    if query:
+        link_qs = link_qs.filter(Q(title__icontains=query) | Q(slug__icontains=query))
+
+    status = request.GET.get("status", "").strip()
+    now = timezone.now()
+    if status == "active":
+        link_qs = link_qs.filter(is_active=True).filter(
+            Q(starts_at__isnull=True) | Q(starts_at__lte=now),
+            Q(expires_at__isnull=True) | Q(expires_at__gt=now),
+        )
+    elif status == "paused":
+        link_qs = link_qs.filter(is_active=False)
+    elif status == "expired":
+        link_qs = link_qs.filter(is_active=True, expires_at__isnull=False, expires_at__lte=now)
+
+    sort = request.GET.get("sort", "created_desc").strip()
+    if sort == "created_asc":
+        link_qs = link_qs.order_by("created_at")
+    elif sort == "clicks_desc":
+        link_qs = link_qs.order_by("-clicks_count", "-created_at")
+    elif sort == "clicks_asc":
+        link_qs = link_qs.order_by("clicks_count", "-created_at")
+    else:
+        link_qs = link_qs.order_by("-created_at")
+
+    try:
+        page = max(int(request.GET.get("page", 1)), 1)
+    except (TypeError, ValueError):
+        page = 1
+    try:
+        page_size = int(request.GET.get("page_size", 10))
+    except (TypeError, ValueError):
+        page_size = 10
+    if page_size not in {10, 25, 50}:
+        page_size = 10
+
+    paginator = Paginator(link_qs, page_size)
+    page_obj = paginator.get_page(page)
+    results = []
+    for link in page_obj.object_list:
+        if link.is_active:
+            if link.expires_at and link.expires_at <= now:
+                status_label = "Expired"
+                status_class = "badge-status-expired"
+            elif link.starts_at and link.starts_at > now:
+                status_label = "Scheduled"
+                status_class = "badge-status-scheduled"
+            else:
+                status_label = "Active"
+                status_class = "badge-status-active"
+        else:
+            status_label = "Paused"
+            status_class = "badge-status-paused"
+        results.append(
+            {
+                "slug": link.slug,
+                "short_url": link.short_url(request),
+                "destination_url": link.destination_url,
+                "clicks": link.clicks_count,
+                "created_at": link.created_at.strftime("%b %d, %Y"),
+                "is_available": link.is_available(),
+                "status_label": status_label,
+                "status_class": status_class,
+                "edit_url": reverse("link_edit", args=[link.slug]),
+                "delete_url": reverse("link_delete", args=[link.slug]),
+                "detail_url": reverse("link_detail", args=[link.slug]),
+            }
+        )
+
+    return JsonResponse(
+        {
+            "page": page_obj.number,
+            "page_size": page_size,
+            "total": paginator.count,
+            "total_pages": paginator.num_pages,
+            "results": results,
+        }
+    )
 
 
 @login_required

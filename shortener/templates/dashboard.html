@@ -193,18 +193,24 @@
           <h4 class="mb-1">Your links</h4>
           <p class="text-muted mb-0">Search and manage links in one place.</p>
         </div>
-        <form method="get" class="dashboard-filters">
-          <input class="form-control form-control-sm" type="search" name="q" placeholder="Search links" />
-          <select class="form-select form-select-sm" name="status" aria-label="Filter by status">
+        <div class="dashboard-filters">
+          <input class="form-control form-control-sm" id="linksSearch" type="search" name="q" placeholder="Search links" />
+          <select class="form-select form-select-sm" id="linksStatus" name="status" aria-label="Filter by status">
             <option value="">All</option>
             <option value="active">Active</option>
             <option value="paused">Paused</option>
             <option value="expired">Expired</option>
           </select>
-          <button class="btn btn-outline-secondary btn-sm" type="submit">Filter</button>
-        </form>
+          <select class="form-select form-select-sm" id="linksSort" name="sort" aria-label="Sort links">
+            <option value="created_desc">Newest</option>
+            <option value="created_asc">Oldest</option>
+            <option value="clicks_desc">Most clicks</option>
+            <option value="clicks_asc">Least clicks</option>
+          </select>
+        </div>
       </div>
-      {% if links %}
+      <input type="hidden" id="linksCsrfToken" value="{{ csrf_token }}" />
+      <div class="dashboard-table-wrap">
         <div class="table-responsive">
           <table class="table table-hover align-middle dashboard-table">
             <thead>
@@ -217,59 +223,31 @@
                 <th class="text-end">Actions</th>
               </tr>
             </thead>
-            <tbody>
-              {% for link in links %}
-                <tr>
-                  <td>
-                    <div class="d-flex flex-column">
-                      <div class="d-flex align-items-center gap-2">
-                        <a class="fw-semibold" href="{% url 'link_detail' link.slug %}">{{ link.slug }}</a>
-                        <button class="btn btn-outline-secondary btn-sm btn-icon" type="button" data-copy="{{ request.scheme }}://{{ request.get_host }}/r/{{ link.slug }}/">Copy</button>
-                      </div>
-                      <div class="text-muted small">{{ request.scheme }}://{{ request.get_host }}/r/{{ link.slug }}/</div>
-                    </div>
-                  </td>
-                  <td>
-                    <span class="table-truncate" title="{{ link.destination_url }}">{{ link.destination_url }}</span>
-                  </td>
-                  <td>{{ link.clicks.count }}</td>
-                  <td>
-                    {% if link.is_available %}
-                      <span class="badge-soft badge-status badge-status-active">Active</span>
-                    {% else %}
-                      <span class="badge-soft badge-status badge-status-paused">Paused</span>
-                    {% endif %}
-                  </td>
-                  <td>{{ link.created_at|date:"M d, Y" }}</td>
-                  <td class="text-end">
-                    <div class="dashboard-actions">
-                      <a class="btn btn-sm btn-outline-primary" href="{% url 'link_edit' link.slug %}">Edit</a>
-                      <form method="post" action="{% url 'link_delete' link.slug %}" class="d-inline">
-                        {% csrf_token %}
-                        {% if link.is_available %}
-                          <button class="btn btn-sm btn-outline-secondary" type="submit">Pause</button>
-                        {% else %}
-                          <button class="btn btn-sm btn-outline-secondary" type="submit">Resume</button>
-                        {% endif %}
-                      </form>
-                      <form method="post" action="{% url 'link_delete' link.slug %}" class="d-inline">
-                        {% csrf_token %}
-                        <button class="btn btn-sm btn-outline-danger" type="submit">Delete</button>
-                      </form>
-                    </div>
-                  </td>
-                </tr>
-              {% endfor %}
-            </tbody>
+            <tbody id="linksTableBody"></tbody>
           </table>
         </div>
-      {% else %}
-        <div class="dashboard-empty">
+        <div class="dashboard-empty" id="linksEmpty" hidden>
           <h5 class="mb-1">No links yet</h5>
           <p class="text-muted mb-3">Create your first link to get started.</p>
           <a class="btn btn-primary" href="#create-link">Create link</a>
         </div>
-      {% endif %}
+      </div>
+      <div class="dashboard-pagination">
+        <div class="dashboard-pagination-left">
+          <label class="text-muted small" for="linksPageSize">Rows per page</label>
+          <select class="form-select form-select-sm" id="linksPageSize">
+            <option value="10">10</option>
+            <option value="25">25</option>
+            <option value="50">50</option>
+          </select>
+          <span class="text-muted small" id="linksRange"></span>
+        </div>
+        <div class="dashboard-pagination-right">
+          <button class="btn btn-outline-secondary btn-sm" type="button" id="linksPrev">Prev</button>
+          <div class="dashboard-page-numbers" id="linksPages"></div>
+          <button class="btn btn-outline-secondary btn-sm" type="button" id="linksNext">Next</button>
+        </div>
+      </div>
     </div>
 
     {% if ad_enabled and not is_premium %}
@@ -289,24 +267,248 @@
 
 {% block extra_scripts %}
 <script>
-  const copyButtons = document.querySelectorAll('[data-copy]');
-  copyButtons.forEach((button) => {
-    button.addEventListener('click', async () => {
-      const value = button.getAttribute('data-copy');
-      if (!value) {
+  const linksTableBody = document.getElementById('linksTableBody');
+  const linksEmpty = document.getElementById('linksEmpty');
+  const linksSearch = document.getElementById('linksSearch');
+  const linksStatus = document.getElementById('linksStatus');
+  const linksSort = document.getElementById('linksSort');
+  const linksPageSize = document.getElementById('linksPageSize');
+  const linksRange = document.getElementById('linksRange');
+  const linksPrev = document.getElementById('linksPrev');
+  const linksNext = document.getElementById('linksNext');
+  const linksPages = document.getElementById('linksPages');
+  const csrfToken = document.getElementById('linksCsrfToken').value;
+  let searchTimer = null;
+  let currentState = {
+    page: 1,
+    page_size: 10,
+    q: '',
+    status: '',
+    sort: 'created_desc',
+  };
+
+  const setSearchParams = (state) => {
+    const params = new URLSearchParams();
+    if (state.page && state.page !== 1) {
+      params.set('page', state.page);
+    }
+    if (state.page_size) {
+      params.set('page_size', state.page_size);
+    }
+    if (state.q) {
+      params.set('q', state.q);
+    }
+    if (state.status) {
+      params.set('status', state.status);
+    }
+    if (state.sort && state.sort !== 'created_desc') {
+      params.set('sort', state.sort);
+    }
+    const queryString = params.toString();
+    const newUrl = queryString ? `${window.location.pathname}?${queryString}` : window.location.pathname;
+    window.history.replaceState({}, '', newUrl);
+  };
+
+  const fetchLinks = async () => {
+    const params = new URLSearchParams({
+      page: currentState.page,
+      page_size: currentState.page_size,
+      q: currentState.q,
+      status: currentState.status,
+      sort: currentState.sort,
+    });
+    const response = await fetch(`/dashboard/links/data/?${params.toString()}`);
+    if (!response.ok) {
+      return;
+    }
+    const data = await response.json();
+    renderLinks(data);
+  };
+
+  const buildPageNumbers = (current, total) => {
+    const pages = [];
+    const windowSize = 2;
+    const start = Math.max(1, current - windowSize);
+    const end = Math.min(total, current + windowSize);
+    if (start > 1) {
+      pages.push(1);
+      if (start > 2) {
+        pages.push('ellipsis-start');
+      }
+    }
+    for (let page = start; page <= end; page += 1) {
+      pages.push(page);
+    }
+    if (end < total) {
+      if (end < total - 1) {
+        pages.push('ellipsis-end');
+      }
+      pages.push(total);
+    }
+    return pages;
+  };
+
+  const renderLinks = (data) => {
+    linksTableBody.innerHTML = '';
+    if (!data.results.length) {
+      linksEmpty.hidden = false;
+      linksRange.textContent = 'Showing 0–0 of 0';
+    } else {
+      linksEmpty.hidden = true;
+      data.results.forEach((link) => {
+        const row = document.createElement('tr');
+        row.innerHTML = `
+          <td>
+            <div class="d-flex flex-column gap-1">
+              <div class="d-flex align-items-center gap-2">
+                <a class="fw-semibold" href="${link.detail_url}">${link.slug}</a>
+                <button class="btn btn-outline-secondary btn-sm btn-icon-only" type="button" data-copy="${link.short_url}" aria-label="Copy short link">
+                  <svg viewBox="0 0 24 24" role="presentation" aria-hidden="true">
+                    <path d="M8 8h9a2 2 0 0 1 2 2v9a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2v-9a2 2 0 0 1 2-2z" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/>
+                    <path d="M6 16H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/>
+                  </svg>
+                </button>
+              </div>
+              <div class="text-muted small">${link.short_url}</div>
+            </div>
+          </td>
+          <td>
+            <span class="table-truncate" title="${link.destination_url}">${link.destination_url}</span>
+          </td>
+          <td>${link.clicks}</td>
+          <td><span class="badge-soft badge-status ${link.status_class}">${link.status_label}</span></td>
+          <td>${link.created_at}</td>
+          <td class="text-end">
+            <details class="action-menu">
+              <summary class="btn btn-outline-secondary btn-sm btn-icon-only" aria-label="Open actions">
+                <span></span>
+              </summary>
+              <div class="action-menu-list">
+                <a class="action-menu-item" href="${link.edit_url}">Edit</a>
+                <form method="post" action="${link.delete_url}">
+                  <input type="hidden" name="csrfmiddlewaretoken" value="${csrfToken}" />
+                  <button class="action-menu-item" type="submit">${link.is_available ? 'Pause' : 'Activate'}</button>
+                </form>
+                <form method="post" action="${link.delete_url}">
+                  <input type="hidden" name="csrfmiddlewaretoken" value="${csrfToken}" />
+                  <button class="action-menu-item text-danger" type="submit">Delete</button>
+                </form>
+              </div>
+            </details>
+          </td>
+        `;
+        linksTableBody.appendChild(row);
+      });
+      const start = (data.page - 1) * data.page_size + 1;
+      const end = start + data.results.length - 1;
+      linksRange.textContent = `Showing ${start}–${end} of ${data.total}`;
+    }
+
+    linksPrev.disabled = data.page <= 1;
+    linksNext.disabled = data.page >= data.total_pages;
+    linksPages.innerHTML = '';
+    buildPageNumbers(data.page, data.total_pages).forEach((page) => {
+      if (page === 'ellipsis-start' || page === 'ellipsis-end') {
+        const ellipsis = document.createElement('span');
+        ellipsis.className = 'dashboard-page-ellipsis';
+        ellipsis.textContent = '…';
+        linksPages.appendChild(ellipsis);
         return;
       }
-      try {
-        await navigator.clipboard.writeText(value);
-        button.textContent = 'Copied';
-        setTimeout(() => {
-          button.textContent = 'Copy';
-        }, 1600);
-      } catch (error) {
-        button.textContent = 'Copy failed';
-      }
+      const button = document.createElement('button');
+      button.type = 'button';
+      button.className = `btn btn-sm ${page === data.page ? 'btn-primary' : 'btn-outline-secondary'}`;
+      button.textContent = page;
+      button.addEventListener('click', () => {
+        currentState.page = page;
+        setSearchParams(currentState);
+        fetchLinks();
+      });
+      linksPages.appendChild(button);
     });
+  };
+
+  const updateState = (updates) => {
+    currentState = { ...currentState, ...updates };
+    if (currentState.page < 1) {
+      currentState.page = 1;
+    }
+    setSearchParams(currentState);
+    fetchLinks();
+  };
+
+  const initStateFromUrl = () => {
+    const params = new URLSearchParams(window.location.search);
+    currentState.page = parseInt(params.get('page') || '1', 10) || 1;
+    currentState.page_size = parseInt(params.get('page_size') || '10', 10) || 10;
+    currentState.q = params.get('q') || '';
+    currentState.status = params.get('status') || '';
+    currentState.sort = params.get('sort') || 'created_desc';
+
+    linksSearch.value = currentState.q;
+    linksStatus.value = currentState.status;
+    linksSort.value = currentState.sort;
+    linksPageSize.value = currentState.page_size.toString();
+    if (!linksPageSize.value) {
+      linksPageSize.value = '10';
+      currentState.page_size = 10;
+    }
+  };
+
+  linksSearch.addEventListener('input', (event) => {
+    window.clearTimeout(searchTimer);
+    searchTimer = window.setTimeout(() => {
+      updateState({ q: event.target.value.trim(), page: 1 });
+    }, 300);
   });
+
+  linksStatus.addEventListener('change', (event) => {
+    updateState({ status: event.target.value, page: 1 });
+  });
+
+  linksSort.addEventListener('change', (event) => {
+    updateState({ sort: event.target.value, page: 1 });
+  });
+
+  linksPageSize.addEventListener('change', (event) => {
+    updateState({ page_size: parseInt(event.target.value, 10), page: 1 });
+  });
+
+  linksPrev.addEventListener('click', () => {
+    if (currentState.page > 1) {
+      updateState({ page: currentState.page - 1 });
+    }
+  });
+
+  linksNext.addEventListener('click', () => {
+    updateState({ page: currentState.page + 1 });
+  });
+
+  document.addEventListener('click', async (event) => {
+    const button = event.target.closest('[data-copy]');
+    if (!button) {
+      return;
+    }
+    const value = button.getAttribute('data-copy');
+    if (!value) {
+      return;
+    }
+    try {
+      await navigator.clipboard.writeText(value);
+      button.classList.add('copied');
+      setTimeout(() => {
+        button.classList.remove('copied');
+      }, 1600);
+    } catch (error) {
+      button.classList.add('copy-failed');
+      setTimeout(() => {
+        button.classList.remove('copy-failed');
+      }, 1600);
+    }
+  });
+
+  initStateFromUrl();
+  fetchLinks();
 
   const trendCanvas = document.getElementById('trendChart');
   if (trendCanvas) {
