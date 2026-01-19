@@ -187,68 +187,72 @@
       </div>
     </div>
 
-    <div class="card dashboard-links dashboard-section">
-      <div class="dashboard-links-head">
-        <div>
-          <h4 class="mb-1">Your links</h4>
-          <p class="text-muted mb-0">Search and manage links in one place.</p>
-        </div>
-        <div class="dashboard-filters">
-          <input class="form-control form-control-sm" id="linksSearch" type="search" name="q" placeholder="Search links" />
-          <select class="form-select form-select-sm" id="linksStatus" name="status" aria-label="Filter by status">
-            <option value="">All</option>
-            <option value="active">Active</option>
-            <option value="paused">Paused</option>
-            <option value="expired">Expired</option>
-          </select>
-          <select class="form-select form-select-sm" id="linksSort" name="sort" aria-label="Sort links">
-            <option value="created_desc">Newest</option>
-            <option value="created_asc">Oldest</option>
-            <option value="clicks_desc">Most clicks</option>
-            <option value="clicks_asc">Least clicks</option>
-          </select>
+    <section class="full-bleed">
+      <div class="full-bleed-inner">
+        <div class="card dashboard-links dashboard-section">
+          <div class="dashboard-links-head">
+            <div>
+              <h4 class="mb-1">Your links</h4>
+              <p class="text-muted mb-0">Search and manage links in one place.</p>
+            </div>
+            <div class="dashboard-filters">
+              <input class="form-control form-control-sm" id="linksSearch" type="search" name="q" placeholder="Search links" />
+              <select class="form-select form-select-sm" id="linksStatus" name="status" aria-label="Filter by status">
+                <option value="">All</option>
+                <option value="active">Active</option>
+                <option value="paused">Paused</option>
+                <option value="expired">Expired</option>
+              </select>
+              <select class="form-select form-select-sm" id="linksSort" name="sort" aria-label="Sort links">
+                <option value="created_desc">Newest</option>
+                <option value="created_asc">Oldest</option>
+                <option value="clicks_desc">Most clicks</option>
+                <option value="clicks_asc">Least clicks</option>
+              </select>
+            </div>
+          </div>
+          <input type="hidden" id="linksCsrfToken" value="{{ csrf_token }}" />
+          <div class="dashboard-table-wrap">
+            <div class="dashboard-table-scroll">
+              <table class="table table-hover align-middle dashboard-table">
+                <thead>
+                  <tr>
+                    <th>Short link</th>
+                    <th>Destination</th>
+                    <th>Clicks</th>
+                    <th>Status</th>
+                    <th>Created</th>
+                    <th class="text-end">Actions</th>
+                  </tr>
+                </thead>
+                <tbody id="linksTableBody"></tbody>
+              </table>
+            </div>
+            <div class="dashboard-empty" id="linksEmpty" hidden>
+              <h5 class="mb-1">No links yet</h5>
+              <p class="text-muted mb-3">Create your first link to get started.</p>
+              <a class="btn btn-primary" href="#create-link">Create link</a>
+            </div>
+          </div>
+          <div class="dashboard-pagination">
+            <div class="dashboard-pagination-left">
+              <label class="text-muted small" for="linksPageSize">Rows per page</label>
+              <select class="form-select form-select-sm" id="linksPageSize">
+                <option value="10">10</option>
+                <option value="25">25</option>
+                <option value="50">50</option>
+              </select>
+              <span class="text-muted small" id="linksRange"></span>
+            </div>
+            <div class="dashboard-pagination-right">
+              <button class="btn btn-outline-secondary btn-sm" type="button" id="linksPrev">Prev</button>
+              <div class="dashboard-page-numbers" id="linksPages"></div>
+              <button class="btn btn-outline-secondary btn-sm" type="button" id="linksNext">Next</button>
+            </div>
+          </div>
         </div>
       </div>
-      <input type="hidden" id="linksCsrfToken" value="{{ csrf_token }}" />
-      <div class="dashboard-table-wrap">
-        <div class="dashboard-table-scroll">
-          <table class="table table-hover align-middle dashboard-table">
-            <thead>
-              <tr>
-                <th>Short link</th>
-                <th>Destination</th>
-                <th>Clicks</th>
-                <th>Status</th>
-                <th>Created</th>
-                <th class="text-end">Actions</th>
-              </tr>
-            </thead>
-            <tbody id="linksTableBody"></tbody>
-          </table>
-        </div>
-        <div class="dashboard-empty" id="linksEmpty" hidden>
-          <h5 class="mb-1">No links yet</h5>
-          <p class="text-muted mb-3">Create your first link to get started.</p>
-          <a class="btn btn-primary" href="#create-link">Create link</a>
-        </div>
-      </div>
-      <div class="dashboard-pagination">
-        <div class="dashboard-pagination-left">
-          <label class="text-muted small" for="linksPageSize">Rows per page</label>
-          <select class="form-select form-select-sm" id="linksPageSize">
-            <option value="10">10</option>
-            <option value="25">25</option>
-            <option value="50">50</option>
-          </select>
-          <span class="text-muted small" id="linksRange"></span>
-        </div>
-        <div class="dashboard-pagination-right">
-          <button class="btn btn-outline-secondary btn-sm" type="button" id="linksPrev">Prev</button>
-          <div class="dashboard-page-numbers" id="linksPages"></div>
-          <button class="btn btn-outline-secondary btn-sm" type="button" id="linksNext">Next</button>
-        </div>
-      </div>
-    </div>
+    </section>
 
     {% if ad_enabled and not is_premium %}
       <div class="card dashboard-card dashboard-sponsored">
